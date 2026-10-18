@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { gfx } from '$lib/gfx';
 	import pokemon from '$data/pokemon.json';
 	import type { Pokedex } from '$parsers/types';
 	import { ColoredCard, TypeIcon, Cycler, FullCycler } from '$ui';
@@ -36,7 +37,7 @@
 							class="flex size-[75px] items-center justify-center rounded-lg bg-white border border-gray-300 dark:border-none"
 						>
 							<img
-								src={`https://raw.githubusercontent.com/KohKaiSern/polishededitor/refs/heads/main/src/${form.paths.sprite}normal.gif`}
+								src={gfx(`${form.paths.sprite}normal.gif`)}
 								alt={`GIF of the front sprite of ${species.name}, ${form.name}`}
 							/>
 						</div>

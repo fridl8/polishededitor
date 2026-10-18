@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { gfx } from '$lib/gfx';
 	import pokemon from '$data/pokemon.json';
 	import type { BoxMon, PartyMon } from '$parsers/types';
 
@@ -12,7 +13,7 @@
 			path = 'gfx/pokemon/egg/';
 		}
 		path += mon.shininess === 'Shiny' ? 'shiny' : 'normal';
-		return `https://raw.githubusercontent.com/KohKaiSern/polishededitor/refs/heads/main/src/${path}.gif`;
+		return gfx(`${path}.gif`);
 	});
 </script>
 

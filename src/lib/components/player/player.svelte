@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { gfx } from '$lib/gfx';
 	import type { Player } from '$parsers/types';
 	import { NumberInput, TextInput } from '$ui';
 	import { Heading, Label, Radio } from 'flowbite-svelte';
@@ -35,7 +36,7 @@
 					class="bg-white size-fit p-2 border-1 rounded-lg border-gray-300 dark:border-gray-600 peer-checked:border-transparent peer-checked:ring-4 peer-checked:ring-purple-300"
 				>
 					<img
-						src={`https://raw.githubusercontent.com/KohKaiSern/polishededitornew/refs/heads/main/src/gfx/trainers/${model.toLowerCase()}.png`}
+						src={gfx(`gfx/trainers/${model.toLowerCase()}.png`)}
 						alt="Player model"
 					/>
 				</div>

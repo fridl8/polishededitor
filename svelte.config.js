@@ -1,4 +1,4 @@
-import adapter from '@sveltejs/adapter-vercel';
+import adapter from '@sveltejs/adapter-static';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 
 /** @type {import('@sveltejs/kit').Config} */
@@ -8,6 +8,10 @@ const config = {
 	preprocess: vitePreprocess(),
 	kit: {
 		adapter: adapter(),
+		paths: {
+			// GitHub Pages serves the site from /<repo>/; the deploy workflow sets this.
+			base: process.env.BASE_PATH ?? ''
+		},
 		alias: {
 			$data: 'src/data',
 			$extractors: 'src/extractors',

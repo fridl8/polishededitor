@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { gfx } from '$lib/gfx';
 	import keyItems from '$data/keyItems.json';
 	import type { Item } from '$parsers/types';
 	import { Combobox } from '$ui';
@@ -20,7 +21,7 @@
 
 	const src = (item: string): string => {
 		const spritePath = keyItems[PF].find((i) => i.name === item)!.spritePath;
-		return `https://raw.githubusercontent.com/KohKaiSern/polishededitor/refs/heads/main/src/${spritePath}`;
+		return gfx(spritePath);
 	};
 </script>
 

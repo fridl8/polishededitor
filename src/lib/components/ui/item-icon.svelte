@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { gfx } from '$lib/gfx';
 	import items from '$data/items.json';
 
 	let {
@@ -9,7 +10,7 @@
 
 	let itemSrc = $derived.by(() => {
 		const spritePath = items[PF].find((i) => i.name === heldItem)!.spritePath;
-		return `https://raw.githubusercontent.com/KohKaiSern/polishededitor/refs/heads/main/src/${spritePath}`;
+		return gfx(spritePath);
 	});
 </script>
 

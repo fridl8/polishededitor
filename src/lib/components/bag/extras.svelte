@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { gfx } from '$lib/gfx';
 	import apricorns from '$data/apricorns.json';
 	import expCandy from '$data/expCandy.json';
 	import wings from '$data/wings.json';
@@ -10,7 +11,7 @@
 
 	const src = (item: string, list: any): string => {
 		const spritePath = list.find((i: any) => i.name === item)!.spritePath;
-		return `https://raw.githubusercontent.com/KohKaiSern/polishededitor/refs/heads/main/src/${spritePath}`;
+		return gfx(spritePath);
 	};
 
 	interface ItemConfig {
