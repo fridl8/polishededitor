@@ -416,9 +416,9 @@
       "name": "Route 5"
     },
     {
-      "id": "UNDERGROUND",
+      "id": "UNDERGROUND_PATH",
       "index": 83,
-      "name": "Underground"
+      "name": "Underground Path"
     },
     {
       "id": "ROUTE_6",
@@ -1143,9 +1143,9 @@
       "name": "Route 5"
     },
     {
-      "id": "UNDERGROUND",
+      "id": "UNDERGROUND_PATH",
       "index": 83,
-      "name": "Underground"
+      "name": "Underground Path"
     },
     {
       "id": "ROUTE_6",

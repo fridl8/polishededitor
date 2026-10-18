@@ -265,6 +265,13 @@
       "name": "Catch Charm",
       "description": "A charm for catching Pokémon.",
       "spritePath": "gfx/items/CATCH_CHARM.png"
+    },
+    {
+      "id": "DEXNAV",
+      "index": 39,
+      "name": "DexNav",
+      "description": "Searches for wild Pokémon nearby.",
+      "spritePath": "gfx/items/DEXNAV.png"
     }
   ],
   "faithful": [
@@ -533,6 +540,13 @@
       "name": "Catch Charm",
       "description": "A charm for catching Pokémon.",
       "spritePath": "gfx/items/CATCH_CHARM.png"
+    },
+    {
+      "id": "DEXNAV",
+      "index": 39,
+      "name": "DexNav",
+      "description": "Searches for wild Pokémon nearby.",
+      "spritePath": "gfx/items/DEXNAV.png"
     }
   ]
 }

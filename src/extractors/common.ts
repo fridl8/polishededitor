@@ -105,7 +105,7 @@ export function extractPaths<T extends Base & { spritePath: string }>(
     const pointer = PTRS[lineNo].slice(4) + '::';
     let pathIndex = PATHS.findIndex((line) => line.includes(pointer));
     while (!PATHS[pathIndex].includes('"')) pathIndex++;
-    const spritePath = PATHS[pathIndex].split('"').at(1)!.replace('2bpp.lz', 'png');
+    const spritePath = PATHS[pathIndex].split('"').at(1)!.replace(/2bpp\.lzp?$/, 'png');
     const entry = data.find((i) => i.index === index);
     if (entry) {
       entry.spritePath = spritePath;

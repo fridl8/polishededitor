@@ -1105,12 +1105,12 @@
       "spritePath": "gfx/items/BLACKGLASSES.png"
     },
     {
-      "id": "PINK_BOW",
+      "id": "FAIRYFEATHER",
       "index": 138,
-      "name": "Pink Bow",
+      "name": "FairyFeather",
       "description": "Powers up Fairytype moves. (Hold)",
       "category": "ITEM",
-      "spritePath": "gfx/items/PINK_BOW.png"
+      "spritePath": "gfx/items/FAIRYFEATHER.png"
     },
     {
       "id": "BERSERK_GENE",
@@ -3147,12 +3147,12 @@
       "spritePath": "gfx/items/BLACKGLASSES.png"
     },
     {
-      "id": "PINK_BOW",
+      "id": "FAIRYFEATHER",
       "index": 138,
-      "name": "Pink Bow",
+      "name": "FairyFeather",
       "description": "Powers up Fairytype moves. (Hold)",
       "category": "ITEM",
-      "spritePath": "gfx/items/PINK_BOW.png"
+      "spritePath": "gfx/items/FAIRYFEATHER.png"
     },
     {
       "id": "BERSERK_GENE",

@@ -136,7 +136,7 @@
       "id": "X_SCISSOR",
       "index": 11,
       "name": "X-Scissor",
-      "description": "Slashes foe with scythes or claws.",
+      "description": "Has a high critical hit ratio.",
       "basePower": 80,
       "type": "BUG",
       "accuracy": 100,
@@ -894,7 +894,7 @@
       "name": "Growth",
       "description": "Raises the user's Atk and Sp.Atk.",
       "basePower": 0,
-      "type": "NORMAL",
+      "type": "GRASS",
       "accuracy": -1,
       "powerPoints": 20,
       "effectChance": 0,
@@ -1569,7 +1569,7 @@
       "type": "STEEL",
       "accuracy": 100,
       "powerPoints": 15,
-      "effectChance": 30,
+      "effectChance": 20,
       "category": "PHYSICAL"
     },
     {
@@ -2779,7 +2779,7 @@
       "description": "An attack that may lower Defense.",
       "basePower": 100,
       "type": "STEEL",
-      "accuracy": 75,
+      "accuracy": 80,
       "powerPoints": 15,
       "effectChance": 30,
       "category": "PHYSICAL"
@@ -3033,7 +3033,7 @@
       "type": "FAIRY",
       "accuracy": 100,
       "powerPoints": 15,
-      "effectChance": 30,
+      "effectChance": 10,
       "category": "SPECIAL"
     },
     {
@@ -3968,7 +3968,7 @@
       "name": "Growth",
       "description": "Raises the user's Atk and Sp.Atk.",
       "basePower": 0,
-      "type": "NORMAL",
+      "type": "GRASS",
       "accuracy": -1,
       "powerPoints": 20,
       "effectChance": 0,
@@ -4643,7 +4643,7 @@
       "type": "STEEL",
       "accuracy": 100,
       "powerPoints": 15,
-      "effectChance": 30,
+      "effectChance": 20,
       "category": "PHYSICAL"
     },
     {
@@ -4905,7 +4905,7 @@
       "description": "Has a high critical hit ratio.",
       "basePower": 100,
       "type": "WATER",
-      "accuracy": 90,
+      "accuracy": 95,
       "powerPoints": 10,
       "effectChance": 0,
       "category": "PHYSICAL"
@@ -6107,7 +6107,7 @@
       "type": "FAIRY",
       "accuracy": 100,
       "powerPoints": 15,
-      "effectChance": 30,
+      "effectChance": 10,
       "category": "SPECIAL"
     },
     {

@@ -158,7 +158,7 @@ function extractSpritePaths(mons: MonList, PNG_PTRS: string[], PNG_PATHS: string
     mon.paths.sprite = PNG_PATHS.find((line) => line.includes(pointer))!
       .split('"')
       .at(1)!
-      .replace('front.animated.2bpp.lz', '');
+      .replace(/front\.animated\.2bpp\.lzp?$/, '');
     index++;
   }
   return mons;
@@ -247,7 +247,8 @@ function extractForms(
   return forms;
 }
 
-function extractPNGs(mons: MonList, forms: Record<string, FormMap[]>): void {
+async function extractPNGs(mons: MonList, forms: Record<string, FormMap[]>): Promise<void> {
+  const writes: Promise<void>[] = [];
   for (const mon of mons.contents) {
     try {
       mkdirSync(import.meta.dirname + `/../${mon.paths.sprite}`);
@@ -273,20 +274,20 @@ function extractPNGs(mons: MonList, forms: Record<string, FormMap[]>): void {
       .split('\n')
       .filter((line) => line.includes('RGB'))
       .map((line) => line.match(/\d+/g)!.map(Number));
-    applyPalette(
+    writes.push(applyPalette(
       `${mon.paths.sprite}front.png`,
       `${mon.paths.sprite}normal.png`,
       NORMAL_PAL[0],
       NORMAL_PAL[1]
-    );
-    applyPalette(
+    ));
+    writes.push(applyPalette(
       `${mon.paths.sprite}front.png`,
       `${mon.paths.sprite}shiny.png`,
       SHINY_PAL[0],
       SHINY_PAL[1]
-    );
+    ));
   }
-  return;
+  await Promise.all(writes);
 }
 
 function extractGIFs(mons: MonList): void {
@@ -476,7 +477,7 @@ for (const PF of ['polished', 'faithful'] as const) {
   mons[PF] = extractPalPaths(mons[PF], files[10][PF]);
   mons[PF] = extractAnimPaths(mons[PF], files[11][PF], files[12][PF]);
   forms[PF] = extractForms(mons[PF], forms[PF], files[0][PF], files[13][PF]);
-  extractPNGs(mons[PF], forms[PF]);
+  await extractPNGs(mons[PF], forms[PF]);
   extractGIFs(mons[PF]);
   pokemon[PF] = extractPokemon(pokemon[PF], mons[PF], forms[PF]);
 }

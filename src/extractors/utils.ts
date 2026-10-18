@@ -78,7 +78,7 @@ export async function applyPalette(
     RGBData[i * 3 + 1] = g;
     RGBData[i * 3 + 2] = b;
   }
-  sharp(RGBData, {
+  await sharp(RGBData, {
     raw: { width: metadata.width!, height: metadata.height!, channels: 3 }
   })
     .png()
