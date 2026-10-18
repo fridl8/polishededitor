@@ -36,7 +36,7 @@ DrawPlayerHP:
 	ld c, e
 
 .not_boxmon
-	predef ComputeHPBarPixels
+	farcall ComputeHPBarPixels
 	ld a, 6
 	ld d, a
 	ld c, a
@@ -330,7 +330,7 @@ GetShininess:
 ; 2: encountered oldbox code
 	dec a
 	jr nz, .other
-	ld a, ERR_OLDBOX
+	ld a, ERR_PC_BOX_OLD
 	jmp Crash
 
 .other
@@ -385,7 +385,7 @@ GetGender:
 ; 2: encountered oldbox code
 	dec a
 	jr nz, .other
-	ld a, ERR_OLDBOX
+	ld a, ERR_PC_BOX_OLD
 	jmp Crash
 
 .other
@@ -452,23 +452,36 @@ GetGender:
 ListMovePP:
 	ld a, [wNumMoves]
 	inc a
-	ld c, a ; no-optimize a = N - a (c gets used in .load_loop)
+	ld c, a ; no-optimize a = N - a (c gets used in .pp_loop and .dash_loop)
 	ld a, NUM_MOVES
 	sub c
 	ld b, a
 	push hl
-	ld a, [wBuffer1]
+	ld a, [wListMovesLineSpacing]
 	ld e, a
-	ld d, $0
-	ld a, '<BOLDP>'
-	call .load_loop
+	ld d, 0
+.pp_loop
+	ld a, SUMMARY_TILE_PP_START
+	ld [hli], a
+	inc a
+	ld [hli], a
+	inc a
+	ld [hld], a
+	dec hl
+	add hl, de
+	dec c
+	jr nz, .pp_loop
 	ld a, b
 	and a
 	jr z, .skip
 	ld c, a
 	ld a, '-'
-	call .load_loop
-
+.dash_loop
+	ld [hli], a
+	ld [hld], a
+	add hl, de
+	dec c
+	jr nz, .dash_loop
 .skip
 	pop hl
 	inc hl
@@ -520,7 +533,7 @@ ListMovePP:
 	lb bc, 1, 2
 	call PrintNum
 	pop hl
-	ld a, [wBuffer1]
+	ld a, [wListMovesLineSpacing]
 	ld e, a
 	ld d, 0
 	add hl, de
@@ -532,14 +545,6 @@ ListMovePP:
 	ld a, b
 	cp NUM_MOVES
 	jr nz, .loop
-	ret
-
-.load_loop
-	ld [hli], a
-	ld [hld], a
-	add hl, de
-	dec c
-	jr nz, .load_loop
 	ret
 
 FixPlayerEVs:
@@ -920,6 +925,19 @@ GetNatureStatMultiplier::
 	pop de
 	ret
 
+GetStatusConditionOrFaintIndex:
+; de points to status from a party_struct
+	ld h, d
+	ld l, e
+	assert MON_STATUS + 2 == MON_HP
+	inc hl
+	inc hl
+	ld a, [hli]
+	or [hl]
+	ld a, 7 ; fnt
+	ret z
+	; fallthrough
+
 GetStatusConditionIndex:
 ; de points to status, e.g. from a party_struct or battle_struct
 ; return the status condition index in a
@@ -941,8 +959,6 @@ GetStatusConditionIndex:
 	ret
 
 .tox
-	inc a ; 7
-.fnt
 	inc a ; 6
 .frz
 	inc a ; 5
@@ -957,23 +973,22 @@ GetStatusConditionIndex:
 	ret
 
 PlaceStatusString:
-	xor a
-	call GetStatusConditionIndex
+; de points to status from a party_struct
+; hl points to where to place the string
+	push hl
+	call GetStatusConditionOrFaintIndex
+	pop hl
 	and a
 	ret z
-	push de
 
-	ld d, 0
 	ld e, a
-	push hl
-	ld hl, StatusStringPointers
-	add hl, de
-	add hl, de
-	ld a, [hli]
+	add e
+	add e
+	add LOW(StatusStrings)
 	ld e, a
-	ld a, [hl]
+	adc HIGH(StatusStrings)
+	sub e
 	ld d, a
-	pop hl
 
 	ld a, [de]
 	inc de
@@ -983,33 +998,22 @@ PlaceStatusString:
 	ld [hli], a
 	ld a, [de]
 	ld [hl], a
-
-	pop de
-	ld a, $1
-	and a
 	ret
 
-StatusStringPointers:
-	dw OKString
-	dw PsnString
-	dw ParString
-	dw SlpString
-	dw BrnString
-	dw FrzString
-	dw FntString
-	dw ToxString
-
-OKString:  rawchar "OK @"
-PsnString: rawchar "Psn@"
-ParString: rawchar "Par@"
-SlpString: rawchar "Slp@"
-BrnString: rawchar "Brn@"
-FrzString: rawchar "Frz@"
-FntString: rawchar "Fnt@"
-ToxString: rawchar "Tox@"
+StatusStrings:
+	table_width 3
+	rawchar "OK "
+	rawchar "Psn"
+	rawchar "Par"
+	rawchar "Slp"
+	rawchar "Brn"
+	rawchar "Frz"
+	rawchar "Tox"
+	rawchar "Fnt"
+	assert_table_length 8
 
 ListMoves:
-; List moves at hl, spaced every [wBuffer1] tiles.
+; List moves at hl, spaced every [wListMovesLineSpacing] tiles.
 	ld de, wListMoves_MoveIndicesBuffer
 	ld b, $0
 .moves_loop
@@ -1029,7 +1033,7 @@ ListMoves:
 	inc b
 	pop hl
 	push bc
-	ld a, [wBuffer1]
+	ld a, [wListMovesLineSpacing]
 	ld c, a
 	ld b, 0
 	add hl, bc
@@ -1045,7 +1049,7 @@ ListMoves:
 .nonmove_loop
 	push af
 	ld [hl], '-'
-	ld a, [wBuffer1]
+	ld a, [wListMovesLineSpacing]
 	ld c, a
 	ld b, 0
 	add hl, bc

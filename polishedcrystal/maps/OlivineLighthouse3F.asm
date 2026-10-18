@@ -69,8 +69,7 @@ OlivineLighthouse3FBattleGirlEmy:
 	opentext
 	writetext .AfterText1
 	promptbutton
-	verbosegiveitem PROTECT_PADS
-	iffalse_endtext
+	verbosegiveitem PROTECT_PADS, iffalse_endtext
 	setevent EVENT_GOT_PROTECT_PADS_FROM_LIGHTHOUSE_LEADER
 	jumpthisopenedtext
 
@@ -150,7 +149,17 @@ Bird_keeperTheoScript:
 	endifjustbattled
 	checkevent EVENT_JASMINE_RETURNED_TO_GYM
 	iftrue_jumptextfaceplayer Bird_keeperTheoFinalText
-	jumptextfaceplayer BirdKeeperTheoAfterBattleText
+	jumpthistextfaceplayer
+
+	text "How the heck do"
+	line "you go up?"
+
+	para "I want to visit"
+	line "the sick #mon,"
+
+	para "but I can't get up"
+	line "there…"
+	done
 
 GenericTrainerGentlemanPreston:
 	generictrainer GENTLEMAN, PRESTON, EVENT_BEAT_GENTLEMAN_PRESTON, GentlemanPrestonSeenText, GentlemanPrestonBeatenText
@@ -187,17 +196,6 @@ Bird_keeperTheoBeatenText:
 	line "concerned…"
 	done
 
-BirdKeeperTheoAfterBattleText:
-	text "How the heck do"
-	line "you go up?"
-
-	para "I want to visit"
-	line "the sick #mon,"
-
-	para "but I can't get up"
-	line "there…"
-	done
-
 Bird_keeperTheoFinalText:
 	text "How the heck do"
 	line "you go up?"
@@ -230,4 +228,3 @@ GentlemanPrestonBeatenText:
 	text "…sigh… I must"
 	line "train some more…"
 	done
-

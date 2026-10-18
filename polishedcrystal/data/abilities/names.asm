@@ -105,6 +105,7 @@ AbilityNames:
 	dw HoneyGather
 	dw Frisk
 	dw Reckless
+	dw BadDreams
 	dw Pickpocket
 	dw SheerForce
 	dw Contrary
@@ -132,6 +133,7 @@ AbilityNames:
 	dw SapSipper
 	dw Prankster
 	dw SandForce
+	dw IronBarbs
 	dw FurCoat
 	dw Bulletproof
 	dw Competitive
@@ -143,6 +145,7 @@ AbilityNames:
 	dw SlushRush
 	dw Galvanize
 	dw Corrosion
+	dw Fluffy
 	dw TanglingHair
 	dw ScreenCleaner
 	dw SteelySpirit
@@ -151,10 +154,12 @@ AbilityNames:
 	dw NeutralizingGas
 	dw PastelVeil
 	dw QuickDraw
+	dw WindRider
 	dw CudChew
 	dw Sharpness
 	dw ArmorTail
 	dw MindsEye
+	dw MegaSol
 	assert_table_length NUM_ABILITIES
 
 NoAbility:       rawchar "---@"
@@ -262,6 +267,7 @@ SnowWarning:     rawchar "Snow Warning@"
 HoneyGather:     rawchar "Honey Gather@"
 Frisk:           rawchar "Frisk@"
 Reckless:        rawchar "Reckless@"
+BadDreams:       rawchar "Bad Dreams@"
 Pickpocket:      rawchar "Pickpocket@"
 SheerForce:      rawchar "Sheer Force@"
 Contrary:        rawchar "Contrary@"
@@ -289,6 +295,7 @@ MagicBounce:     rawchar "Magic Bounce@"
 SapSipper:       rawchar "Sap Sipper@"
 Prankster:       rawchar "Prankster@"
 SandForce:       rawchar "Sand Force@"
+IronBarbs:       rawchar "Iron Barbs@"
 FurCoat:         rawchar "Fur Coat@"
 Bulletproof:     rawchar "Bulletproof@"
 Competitive:     rawchar "Competitive@"
@@ -300,6 +307,7 @@ Berserk:         rawchar "Berserk@"
 SlushRush:       rawchar "Slush Rush@"
 Galvanize:       rawchar "Galvanize@"
 Corrosion:       rawchar "Corrosion@"
+Fluffy:          rawchar "Fluffy@"
 TanglingHair:    rawchar "Tangling Hair@"
 ScreenCleaner:   rawchar "Screen Cleaner@"
 SteelySpirit:    rawchar "Steely Spirit@"
@@ -308,7 +316,9 @@ GorillaTactics:  rawchar "Gorilla Tactics@"
 NeutralizingGas: rawchar "Neutralizing Gas@"
 PastelVeil:      rawchar "Pastel Veil@"
 QuickDraw:       rawchar "Quick Draw@"
+WindRider:       rawchar "Wind Rider@"
 CudChew:         rawchar "Cud Chew@"
 Sharpness:       rawchar "Sharpness@"
 ArmorTail:       rawchar "Armor Tail@"
 MindsEye:        rawchar "Mind's Eye@"
+MegaSol:         rawchar "Mega Sol@"

@@ -98,6 +98,7 @@ IntroScene1:
 	call ClearSprites
 	call ClearTileMap
 	xor a
+	assert NO_BG_MAP_TRANSFER == 0
 	ldh [hBGMapMode], a
 	ld a, $1
 	ldh [rVBK], a
@@ -169,6 +170,7 @@ IntroScene3:
 	call ClearSprites
 	call ClearTileMap
 	xor a
+	assert NO_BG_MAP_TRANSFER == 0
 	ldh [hBGMapMode], a
 	ld a, $1
 	ldh [rVBK], a
@@ -202,6 +204,7 @@ IntroScene5:
 	ld hl, rIE
 	res B_IE_STAT, [hl]
 	xor a
+	assert NO_BG_MAP_TRANSFER == 0
 	ldh [hBGMapMode], a
 	ldh [hLCDCPointer], a
 	ld a, $1
@@ -292,6 +295,7 @@ IntroScene7:
 	call ClearSprites
 	call ClearTileMap
 	xor a
+	assert NO_BG_MAP_TRANSFER == 0
 	ldh [hBGMapMode], a
 
 	ld a, $1
@@ -372,7 +376,7 @@ IntroScene9:
 	ld bc, 3 * SCREEN_WIDTH
 	ld a, $3
 	rst ByteFill
-	ld a, $2
+	ld a, TRANSFER_ATTRMAP
 	ldh [hBGMapMode], a
 	call DelayFrame
 	call DelayFrame
@@ -383,6 +387,7 @@ IntroScene9:
 	call DelayFrame
 	call DelayFrame
 	xor a
+	assert NO_BG_MAP_TRANSFER == 0
 	ldh [hBGMapMode], a
 	ldh [hBGMapAddress], a
 	ld [wGlobalAnimXOffset], a
@@ -423,6 +428,7 @@ IntroScene11:
 	ld hl, rIE
 	res B_IE_STAT, [hl]
 	xor a
+	assert NO_BG_MAP_TRANSFER == 0
 	ldh [hBGMapMode], a
 	ldh [hLCDCPointer], a
 	ld a, $1
@@ -539,6 +545,7 @@ IntroScene13:
 	call ClearSprites
 	call ClearTileMap
 	xor a
+	assert NO_BG_MAP_TRANSFER == 0
 	ldh [hBGMapMode], a
 	ld a, $1
 	ldh [rVBK], a
@@ -611,6 +618,7 @@ IntroScene15:
 	call ClearSprites
 	call ClearTileMap
 	xor a
+	assert NO_BG_MAP_TRANSFER == 0
 	ldh [hBGMapMode], a
 	ld a, $1
 	ldh [rVBK], a
@@ -689,6 +697,7 @@ IntroScene17:
 	call ClearSprites
 	call ClearTileMap
 	xor a
+	assert NO_BG_MAP_TRANSFER == 0
 	ldh [hBGMapMode], a
 	ld a, $1
 	ldh [rVBK], a
@@ -751,6 +760,7 @@ IntroScene19:
 	call ClearSprites
 	call ClearTileMap
 	xor a
+	assert NO_BG_MAP_TRANSFER == 0
 	ldh [hBGMapMode], a
 	ld a, $1
 	ldh [rVBK], a
@@ -846,6 +856,7 @@ IntroScene21:
 	ld c, 3
 	call DelayFrames
 	xor a
+	assert NO_BG_MAP_TRANSFER == 0
 	ldh [hBGMapMode], a
 	ld [wIntroSceneFrameCounter], a
 	ld [wIntroSceneTimer], a
@@ -901,6 +912,7 @@ IntroScene26:
 	call ClearSprites
 	call ClearTileMap
 	xor a
+	assert NO_BG_MAP_TRANSFER == 0
 	ldh [hBGMapMode], a
 	ld a, $1
 	ldh [rVBK], a
@@ -1378,6 +1390,7 @@ Intro_Scene16_AnimateSuicune:
 	cp $3
 	ret nz
 	xor a
+	assert NO_BG_MAP_TRANSFER == 0
 	ldh [hBGMapMode], a
 	ret
 
@@ -1398,7 +1411,7 @@ Intro_ColoredSuicuneFrameSwap:
 	ld a, c
 	or b
 	jr nz, .loop
-	ld a, $1
+	ld a, TRANSFER_TILEMAP
 	ldh [hBGMapMode], a
 	ret
 
@@ -1546,13 +1559,13 @@ Intro_PerspectiveScrollBG:
 	ret
 
 IntroSuicuneRunGFX:
-INCBIN "gfx/intro/suicune_run.2bpp.lz"
+INCBIN "gfx/intro/suicune_run.2bpp.lzp"
 
 IntroPichuWooperGFX:
-INCBIN "gfx/intro/pichu_wooper.2bpp.lz"
+INCBIN "gfx/intro/pichu_wooper.2bpp.lzp"
 
 IntroTilemap003:
-INCBIN "gfx/intro/003.tilemap.lz"
+INCBIN "gfx/intro/003.tilemap.lzp"
 
 Intro_SetupCommonScenery:
 	ld hl, IntroBackgroundGFX
@@ -1593,88 +1606,88 @@ Intro_SetupCommonScenery:
 	ret
 
 IntroBackgroundGFX:
-INCBIN "gfx/intro/background.2bpp.lz"
+INCBIN "gfx/intro/background.2bpp.lzp"
 
 IntroTilemap004:
-INCBIN "gfx/intro/004.tilemap.lz"
+INCBIN "gfx/intro/004.tilemap.lzp"
 
 Palette_e5edd:
 INCLUDE "gfx/intro/background.pal"
 
 IntroUnownsGFX:
-INCBIN "gfx/intro/unowns.2bpp.lz"
+INCBIN "gfx/intro/unowns.2bpp.lzp"
 
 IntroPulseGFX:
-INCBIN "gfx/intro/pulse.2bpp.lz"
+INCBIN "gfx/intro/pulse.2bpp.lzp"
 
 IntroTilemap002:
-INCBIN "gfx/intro/002.tilemap.lz"
+INCBIN "gfx/intro/002.tilemap.lzp"
 
 IntroTilemap001:
-INCBIN "gfx/intro/001.tilemap.lz"
+INCBIN "gfx/intro/001.tilemap.lzp"
 
 IntroTilemap006:
-INCBIN "gfx/intro/006.tilemap.lz"
+INCBIN "gfx/intro/006.tilemap.lzp"
 
 IntroTilemap005:
-INCBIN "gfx/intro/005.tilemap.lz"
+INCBIN "gfx/intro/005.tilemap.lzp"
 
 IntroTilemap008:
-INCBIN "gfx/intro/008.tilemap.lz"
+INCBIN "gfx/intro/008.tilemap.lzp"
 
 IntroTilemap007:
-INCBIN "gfx/intro/007.tilemap.lz"
+INCBIN "gfx/intro/007.tilemap.lzp"
 
 Palette_365ad:
 INCLUDE "gfx/intro/unowns.pal"
 
 IntroCrystalUnownsGFX:
-INCBIN "gfx/intro/crystal_unowns.2bpp.lz"
+INCBIN "gfx/intro/crystal_unowns.2bpp.lzp"
 
 IntroTilemap017:
-INCBIN "gfx/intro/017.tilemap.lz"
+INCBIN "gfx/intro/017.tilemap.lzp"
 
 IntroTilemap015:
-INCBIN "gfx/intro/015.tilemap.lz"
+INCBIN "gfx/intro/015.tilemap.lzp"
 
 Palette_e679d:
 INCLUDE "gfx/intro/crystal_unowns.pal"
 
 IntroSuicuneCloseGFX:
-INCBIN "gfx/intro/suicune_close.2bpp.lz"
+INCBIN "gfx/intro/suicune_close.2bpp.lzp"
 
 IntroTilemap012:
-INCBIN "gfx/intro/012.tilemap.lz"
+INCBIN "gfx/intro/012.tilemap.lzp"
 
 IntroTilemap011:
-INCBIN "gfx/intro/011.tilemap.lz"
+INCBIN "gfx/intro/011.tilemap.lzp"
 
 Palette_e6d6d:
 INCLUDE "gfx/intro/suicune_close.pal"
 
 IntroSuicuneJumpGFX:
-INCBIN "gfx/intro/suicune_jump.2bpp.lz"
+INCBIN "gfx/intro/suicune_jump.2bpp.lzp"
 
 IntroSuicuneBackGFX:
-INCBIN "gfx/intro/suicune_back.2bpp.lz"
+INCBIN "gfx/intro/suicune_back.2bpp.lzp"
 
 IntroTilemap010:
-INCBIN "gfx/intro/010.tilemap.lz"
+INCBIN "gfx/intro/010.tilemap.lzp"
 
 IntroTilemap009:
-INCBIN "gfx/intro/009.tilemap.lz"
+INCBIN "gfx/intro/009.tilemap.lzp"
 
 IntroTilemap014:
-INCBIN "gfx/intro/014.tilemap.lz"
+INCBIN "gfx/intro/014.tilemap.lzp"
 
 IntroTilemap013:
-INCBIN "gfx/intro/013.tilemap.lz"
+INCBIN "gfx/intro/013.tilemap.lzp"
 
 Palette_e77dd:
 INCLUDE "gfx/intro/suicune.pal"
 
 IntroUnownBackGFX:
-INCBIN "gfx/intro/unown_back.2bpp.lz"
+INCBIN "gfx/intro/unown_back.2bpp.lzp"
 
 IntroGrass1GFX:
 INCBIN "gfx/intro/grass1.2bpp"

@@ -105,103 +105,16 @@ wTempoAdjustment:: db
 ; audio engine output
 wNoiseHit:: db
 
-SECTION "WRAM 0", WRAM0
 
-wMonType:: db
+SECTION "Video", WRAM0
 
-wCurSpecies::
-wCurMove::
-wCreditsSpawn::
-	db
+wBGMapBuffer:: ds 48
+wBGMapBufferEnd::
+wBGMapPalBuffer:: ds 48
+wBGMapPalBufferEnd::
+wBGMapBufferPtrs:: ds 48 ; 24 bg map addresses (16x8 tiles)
+wTileAnimationTimer:: db
 
-wTimeSinceText:: db
-
-wCurOptionsPage:: db
-
-wBattleTowerBattleEnded::
-	db
-
-wCurForm:: db
-
-wRNGState:: ds 4
-wRNGCumulativeDividerPlus:: dw
-wRNGCumulativeDividerMinus:: db
-
-wBoxAlignment:: db
-wInputType:: db
-wAutoInputAddress:: dw
-wAutoInputBank:: db
-wAutoInputLength:: db
-
-wMonStatusFlags:: db
-wGameLogicPaused:: db
-wSpriteUpdatesEnabled:: db
-wMapTimeOfDay:: db
-
-wPrevDexEntry:: db
-
-wPrevLandmark:: db
-wCurLandmark:: db
-wLandmarkSignTimer:: dw
-wLinkMode::
-; 0 not in link battle
-; 1 link battle
-; 4 mobile battle
-	db
-
-wPlayerNextMovement:: db
-wPlayerMovement:: db
-
-wMovementObject:: db
-wMovementDataPointer:: ds 3 ; dba
-
-wMovementByteWasControlSwitch:: db
-
-UNION
-wObjectPriorities:: ds NUM_OBJECT_STRUCTS
-NEXTU
-wMovementPointer:: dw
-	ds 2
-wTempObjectCopyMapObjectIndex:: db
-wTempObjectCopySprite:: db
-wTempObjectCopySpriteVTile:: db
-wTempObjectCopyPalette:: db
-wTempObjectCopyMovement:: db
-wTempObjectCopyRange:: db
-wTempObjectCopyX:: db
-wTempObjectCopyY:: db
-wTempObjectCopyRadius:: db
-ENDU
-
-wTileDown:: db
-wTileUp:: db
-wTileLeft:: db
-wTileRight:: db
-
-wTilePermissions::
-; set if tile behavior prevents
-; you from walking in that direction
-; bit 3: down
-; bit 2: up
-; bit 1: left
-; bit 0: right
-	db
-
-wPanningAroundTinyMap:: db
-wSavedXCoord:: db
-
-wLinkOtherPlayerGameID:: db
-wLinkOtherPlayerVersion:: dw
-wLinkOtherPlayerMinTradeVersion:: dw
-wLinkOtherPlayerGender:: db
-
-wPalFlags:: db
-
-wPlayerCurrentOAMSlot:: db
-
-wMapSetupFlags:: db
-
-wPrinterConnectionOpen:: db
 
 SECTION "Sprite Animations", WRAM0
 
@@ -253,6 +166,9 @@ wShadowOAMEnd::
 SECTION "Tilemap and Attrmap", WRAM0
 
 ; Some code depend on these being next to each other in memory.
+; Walking streams directly to wBGMapBuffer/wBGMapPalBuffer and does not
+; maintain these screen buffers. Call LoadMapPart before consuming a full
+; overworld screen (as map loading and ReanchorBGMap already do).
 wTilemap::
 ; 20x18 grid of 8x8 tiles
 	ds SCREEN_AREA
@@ -338,6 +254,7 @@ SECTION UNION "Misc 404", WRAM0
 wLinkMisc:: ds 10
 wLinkPlayerFixedPartyMon1ID:: ds 3
 	ds 37
+
 
 SECTION UNION "Misc 404", WRAM0
 ; polished link transfer buffer
@@ -663,7 +580,13 @@ wEnemyCharging:: db
 
 wGivingExperienceToExpShareHolders:: db
 
-wInAbility:: db ; disables animations for abilities among other things
+wInAbility::
+; bit 4: enemy ability visible
+; bit 3: player ability visible
+; bit 2: enemy ability pending
+; bit 1: player ability pending
+; bit 0: ongoing ability trigger
+	db
 
 wBattleEnded:: db
 
@@ -803,6 +726,7 @@ wPokegearRadioChannelAddr:: dw
 wPokegearRadioMusicPlaying:: db
 wPokegearNumberBuffer:: db
 wPokegearMapCursorSpawnpoint:: db
+wPokegearPhoneMaxContact:: db
 
 
 SECTION UNION "Misc 404", WRAM0
@@ -846,25 +770,6 @@ wDiscardPileEnd::
 wCardFlipEnd::
 
 
-;SECTION UNION "Misc 404", WRAM0
-;; memory game
-;	ds 172
-;
-;wMemoryGame::
-;wMemoryGameCards:: ds 9 * 5
-;wMemoryGameCardsEnd::
-;wMemoryGameLastCardPicked:: db
-;wMemoryGameCard1:: db
-;wMemoryGameCard2:: db
-;wMemoryGameCard1Location:: db
-;wMemoryGameCard2Location:: db
-;wMemoryGameNumberTriesRemaining:: db
-;wMemoryGameLastMatches:: ds 5
-;wMemoryGameCounter:: db
-;wMemoryGameNumCardsMatched:: db
-;wMemoryGameEnd::
-
-
 SECTION UNION "Misc 404", WRAM0
 ; Unown puzzle
 	ds 172
@@ -874,27 +779,15 @@ wPuzzlePieces:: ds 6 * 6
 wUnownPuzzleEnd::
 
 
-SECTION "Footprint Queue", WRAM0
-; volatile footprints in sand
-
-wFootprintQueue:: ds 3 * 2 + 1
-
-
-SECTION "Unused", WRAM0
-
-	ds 69 ; it's free real estate
-
-
-SECTION UNION "Misc 1326", WRAM0
+SECTION UNION "Misc 1300", WRAM0
 ; overworld map
 
-; large enough for 45x20 NavelRockInside.ablk; (45+6)x(20+6) = 1326
-; was originally only 1300 bytes
-wOverworldMapBlocks:: ds 1326
+; large enough for 32x27 Route41.ablk; (32+6)x(27+6) = 1254
+wOverworldMapBlocks:: ds 1300
 wOverworldMapBlocksEnd::
 
 
-SECTION UNION "Misc 1326", WRAM0
+SECTION UNION "Misc 1300", WRAM0
 ; psychic inver party
 
 ; large enough for 4x4 KantoHouse1.asm in wOverworldMapBlocks
@@ -911,18 +804,18 @@ wInverGroup::
 	endr
 
 
-SECTION UNION "Misc 1326", WRAM0
+SECTION UNION "Misc 1300", WRAM0
 ; credits image
 
-wCreditsBlankFrame2bpp:: ds 8 * 8 * 2
+wCreditsBlankFrame2bpp:: ds 16 tiles
 
 
-SECTION UNION "Misc 1326", WRAM0
+SECTION UNION "Misc 1300", WRAM0
 ; Bill's PC
 
 	; LCD hblank code block. Labels are defined as part of the code.
 	ds $cf
-	assert BillsPC_LCDCode.End - BillsPC_LCDCode == @ - STARTOF("Misc 1326")
+	assert BillsPC_LCDCode.End - BillsPC_LCDCode == @ - STARTOF("Misc 1300")
 
 ; If you change ordering of this, remember to fix LCD hblank code too.
 ; Note that (as of when comment was written), hblank can't always keep up
@@ -996,28 +889,29 @@ wSummaryMoveSwap:: db
 
 ; Used to align window buffer for DMA copying
 ; Feel free to use or move data, an assert will fail if the memory becomes misaligned
-ds 13
+ds 9
 assert @ % 16 == 0
 
 wSummaryScreenWindowBuffer:: ds 32 * 10
+wSummaryScreenPPTileBuffer:: ds 3 * TILE_1BPP_SIZE
 
-SECTION UNION "Misc 1326", WRAM0
+
+SECTION UNION "Misc 1300", WRAM0
 ; raw link data
 
 wLinkData:: ds 1300
 wLinkDataEnd::
 
 
-SECTION UNION "Misc 1326", WRAM0
-; link data members
+SECTION UNION "Misc 1300", WRAM0
+; decoded link data members (without the serial preamble)
 
 wLinkPlayerName:: ds NAME_LENGTH
 wLinkPartyCount:: db
-wLinkPartySpecies:: ds PARTY_LENGTH
-wLinkPartyEnd:: db ; older code doesn't check PartyCount
 
 UNION
 ; link player data
+wLinkPlayerID:: dw
 wLinkPlayerData::
 for n, 1, PARTY_LENGTH + 1
 wLinkPlayerPartyMon{d:n}:: party_struct wLinkPlayerPartyMon{d:n}
@@ -1041,7 +935,7 @@ wLinkPatchList2:: ds SERIAL_PATCH_LIST_LENGTH
 ENDU
 
 
-SECTION UNION "Misc 1326", WRAM0
+SECTION UNION "Misc 1300", WRAM0
 ; link mail data
 	ds 500
 
@@ -1060,7 +954,7 @@ wLinkOTMailEnd::
 	ds 10
 
 
-SECTION UNION "Misc 1326", WRAM0
+SECTION UNION "Misc 1300", WRAM0
 ; received link mail data
 	ds 500
 
@@ -1068,7 +962,7 @@ wLinkReceivedMail:: ds MAIL_STRUCT_LENGTH * PARTY_LENGTH
 wLinkReceivedMailEnd:: db
 
 
-SECTION UNION "Misc 1326", WRAM0
+SECTION UNION "Misc 1300", WRAM0
 
 ; GB Printer data
 wGameboyPrinterRAM::
@@ -1105,19 +999,108 @@ wGameboyPrinterRAMEnd::
 wPrinterOpcode:: db
 
 
-SECTION "Video", WRAM0
+SECTION UNION "Misc 1300", WRAM0
 
-wBGMapBuffer:: ds 48
-wBGMapBufferEnd::
-wBGMapPalBuffer:: ds 48
-wBGMapPalBufferEnd::
-wBGMapBufferPtrs:: ds 48 ; 24 bg map addresses (16x8 tiles)
-
-wTileAnimBuffer:: ds 1 tiles
-wTileAnimationTimer:: db
+wMPNotes:: ds 3 * 256
 
 
-SECTION "More WRAM 0", WRAM0
+SECTION "WRAM 0", WRAM0
+
+wMonType:: db
+
+wCurSpecies::
+wCurMove::
+wCreditsSpawn::
+	db
+
+wTimeSinceText:: db
+
+wCurOptionsPage:: db
+
+wBattleTowerBattleEnded:: db
+
+wCurForm:: db
+
+wRNGState:: ds 4
+wRNGCumulativeDividerPlus:: dw
+wRNGCumulativeDividerMinus:: db
+
+wBoxAlignment:: db
+wInputType:: db
+wAutoInputAddress:: dw
+wAutoInputBank:: db
+wAutoInputLength:: db
+
+wMonStatusFlags:: db
+wGameLogicPaused:: db
+wSpriteUpdatesEnabled:: db
+wMapTimeOfDay:: db
+
+wPrevDexEntry:: db
+
+wPrevLandmark:: db
+wCurLandmark:: db
+wLandmarkSignTimer:: dw
+wLinkMode::
+; 0 not in link battle
+; 1 link battle
+; 4 mobile battle
+	db
+
+wPlayerNextMovement:: db
+
+wNumHits:: db
+
+wMovementObject:: db
+wMovementDataPointer:: ds 3 ; dba
+
+wMovementByteWasControlSwitch:: db
+
+UNION
+wObjectPriorities:: ds NUM_OBJECT_STRUCTS
+NEXTU
+wMovementPointer:: dw
+	ds 2
+wTempObjectCopyMapObjectIndex:: db
+wTempObjectCopySprite:: db
+wTempObjectCopySpriteVTile:: db
+wTempObjectCopyPalette:: db
+wTempObjectCopyMovement:: db
+wTempObjectCopyRange:: db
+wTempObjectCopyX:: db
+wTempObjectCopyY:: db
+wTempObjectCopyRadius:: db
+ENDU
+
+wTileDown:: db
+wTileUp:: db
+wTileLeft:: db
+wTileRight:: db
+
+wTilePermissions::
+; set if tile behavior prevents
+; you from walking in that direction
+; bit 3: down
+; bit 2: up
+; bit 1: left
+; bit 0: right
+	db
+
+wPanningAroundTinyMap:: db
+wSavedXCoord:: db
+
+wLinkOtherPlayerGameID:: db
+wLinkOtherPlayerVersion:: dw
+wLinkOtherPlayerMinTradeVersion:: dw
+wLinkOtherPlayerGender:: db
+
+wPalFlags:: db
+
+wPlayerCurrentOAMSlot:: db
+
+wMapSetupFlags:: db
+
+wPrinterConnectionOpen:: db
 
 wMemCGBLayout:: db
 
@@ -1198,10 +1181,6 @@ wCardFlipCursorY:: db
 wCardFlipCursorX:: db
 wCardFlipWhichCard:: db
 
-;NEXTU
-;; unused memory game
-;wMemoryGameCardChoice:: db
-
 NEXTU
 ; magnet train
 wMagnetTrainOffset:: db
@@ -1235,8 +1214,8 @@ wRandomValue::
 wEchoRAMTest::
 	db
 wPrinterQueueLength::
-wFrameCounter2:: db
-wUnusedTradeAnimPlayEvolutionMusic:: db
+wFrameCounter2::
+	db
 
 ENDU
 
@@ -1383,8 +1362,6 @@ wBGP:: db
 wOBP0:: db
 wOBP1:: db
 
-wNumHits:: db
-
 wOverworldWeatherTimer:: db
 wOverworldWeatherCooldown:: db
 wSpriteOverlapCount:: db
@@ -1393,11 +1370,40 @@ wPrevWeather:: db
 wCurWeather:: db
 wPrevOvercastIndex:: db
 
+wPalState:: db
+wPalWhiteState:: db
+
+wPalStates::
+wPrevPalStates::
+wPrevPalWeatherState:: db
+wPrevPalDarknessState:: db
+wPrevPalOvercastIndexState:: db
+wPrevPalTimeOfDayPalState:: db
+
+wCurPalStates::
+wCurPalWeatherState:: db
+wCurPalDarknessState:: db
+wCurPalOvercastIndexState:: db
+wCurPalTimeOfDayPalState:: db
+
+; volatile footprints in sand
+wFootprintQueue:: ds 3 * 2 + 1
+
+wColoredMaleFemaleShinyTiles:: ds 3 tiles
+
+wSpecialPalStart:: db
+wSpecialPalCount:: db
+
+wSPBuffer:: dw
+
 
 SECTION "Options", WRAM0
 
 wOptions3::
 ; bit 0: keyword abc/qwerty
+; bit 1: nicknames always ("Yes")
+; bit 2: nicknames never ("No")
+; (bits 1 and 2 are never both set; both clear = "Ask")
 ; bits 3-7: unused
 	db
 
@@ -1407,7 +1413,7 @@ wOptions1::
 ; bit 0-1: text delay
 ;   inst 0; fast 1; mid 2; slow 3
 ; bit 2-3: text autoscroll
-;   none 0; start 1; a+b 2; a or b 3
+;   none 0; start 1; b 2; a or b 3
 ; bit 4: turning step
 ; bit 5: no text delay
 ; bit 6: stereo off/on
@@ -1455,7 +1461,8 @@ wInitialOptions2::
 ; bit 2: no exp on/off (cannot be set together with scaled exp)
 ; bit 3: use RTC
 ; bit 4: evolve in battle
-; bits 5-6: unused
+; bit 5: unused
+; bit 6: no random encounters during a DexNav hunt
 ; bit 7: ask to reset at start
 	db
 wOptionsEnd::
@@ -1469,6 +1476,7 @@ wDaysSince:: db
 ; Temporary backup for options
 wOptionsBuffer:: db
 
+
 SECTION "SRAM Access Count", WRAM0
 
 ; Contains a count of the number of times SRAM has been opened in a
@@ -1476,9 +1484,76 @@ SECTION "SRAM Access Count", WRAM0
 ; when loading a savestate.
 wSRAMAccessCount:: db
 
-SECTION "Rom Checksum", WRAM0
+
+SECTION "ROM Checksum", WRAM0
 
 ; Contains a copy of the rom checksum, read from the header. Used as
 ; protection against people trying to load a save state for a save in
 ; a different rom version.
 wRomChecksum:: dw
+
+
+SECTION "Object Palette Scan Scratch", WRAM0
+
+; Per-call results of the first dynamic object palette allocation pass.
+wResolvedObjectPals:: ds NUM_OBJECT_STRUCTS
+
+; Invalidate the selected map rectangle palettes across text/menu rendering.
+wPaletteSwapNeedsReload:: db
+wPaletteSwapReloadMask:: db
+
+
+SECTION "DexNav WRAM0", WRAM0
+
+; Scratch that's never needed at the same time, so it shares space.
+UNION
+; Species list for the DexNav menu: count, (species, form) * count, -1.
+; The evening list can combine the day and night tables. Only read while
+; the menu is open.
+wDexNavList:: ds 1 + DEXNAV_LIST_MAX * 2 + 1
+; Each entry's marks (see DEXNAV_NUM_MARKS), and the marks being added
+wDexNavListMarks:: ds DEXNAV_LIST_MAX
+wDexNavNewMarks:: db
+; Which tab the list shows (DEXNAV_TAB_*)
+wDexNavTab:: db
+; The search level the info panel is showing
+wDexNavShownLevel:: db
+; Which mini slot (tiles and palette) DexNav_DrawMini uses
+wDexNavMiniSlot:: db
+; DexNav_ShowPreview scratch
+wDexNavPreviewLevel:: db
+wDexNavPreviewPersonality:: ds 2
+; Colors 1-3 of a list row's mini palette, before they're copied in
+wDexNavMiniPal:: ds 3 * 2
+NEXTU
+; Which tiles around the player a hunt target can use (DexNav_StartHunt)
+wDexNavReach:: ds DEXNAV_REACH_SIZE * DEXNAV_REACH_SIZE
+wDexNavReachMode:: db ; LAND_TILE or WATER_TILE
+NEXTU
+; DexNav_SuccessRoll
+wDexNavOddsPrev:: db
+wDexNavOddsSum:: db
+ENDU
+
+wDexNavListCursor:: db
+
+; Active hunt: the rustle's object struct index (0 = no hunt) and its coords.
+wDexNavHuntObject:: db
+wDexNavHuntX:: db
+wDexNavHuntY:: db
+; What the hunt is for (separate from the list's last target, D19)
+wDexNavHuntSpecies:: db
+wDexNavHuntForm:: db
+wDexNavHuntFlags:: db
+; Boosts rolled when the hunt starts (D20)
+wDexNavHuntAbility:: db ; ABILITY_1, ABILITY_2 or HIDDEN_ABILITY (D32)
+wDexNavHuntPotential:: db ; number of perfect stats, 0-3
+wDexNavHuntEggMove:: db ; replaces move slot 1, or 0
+wDexNavHuntShinyPasses:: db ; extra shiny checks (D10)
+wDexNavHuntItem:: db ; held item rolled at hunt start (D27), or NO_ITEM
+wDexNavHuntLevelBonus:: db ; added to the wild level (chain)
+wDexNavHuntLevel:: db ; slot level from hunt start (D32), before the bonus
+; Steps taken since the hunt started
+wDexNavHuntSteps:: db
+; Set by a failed search; cleared by taking a step or picking another species.
+wDexNavCooldown:: db

@@ -1,44 +1,46 @@
 Route36_MapScriptHeader:
 	def_scene_scripts
+	scene_const SCENE_ROUTE36_NOOP
+	scene_const SCENE_ROUTE36_SUICUNE
 
 	def_callbacks
 	callback MAPCALLBACK_OBJECTS, Route36ArthurCallback
 
 	def_warp_events
-	warp_event 22,  8, ROUTE_36_NATIONAL_PARK_GATE, 3
-	warp_event 22,  9, ROUTE_36_NATIONAL_PARK_GATE, 4
-	warp_event 51, 13, ROUTE_36_RUINS_OF_ALPH_GATE, 1
-	warp_event 52, 13, ROUTE_36_RUINS_OF_ALPH_GATE, 2
-	warp_event 61,  8, ROUTE_36_VIOLET_GATE, 1
-	warp_event 61,  9, ROUTE_36_VIOLET_GATE, 2
-	warp_event 30, 12, HIDDEN_TREE_GROTTO, 1
+	warp_event  4,  8, ROUTE_36_NATIONAL_PARK_GATE, 3
+	warp_event  4,  9, ROUTE_36_NATIONAL_PARK_GATE, 4
+	warp_event 33, 13, ROUTE_36_RUINS_OF_ALPH_GATE, 1
+	warp_event 34, 13, ROUTE_36_RUINS_OF_ALPH_GATE, 2
+	warp_event 41,  8, ROUTE_36_VIOLET_GATE, 1
+	warp_event 41,  9, ROUTE_36_VIOLET_GATE, 2
+	warp_event 12, 12, HIDDEN_TREE_GROTTO, 1
 
 	def_coord_events
-	coord_event 24,  7, 1, Route36SuicuneScript
-	coord_event 26,  7, 1, Route36SuicuneScript
+	coord_event  6,  7, SCENE_ROUTE36_SUICUNE, Route36SuicuneScript
+	coord_event  8,  7, SCENE_ROUTE36_SUICUNE, Route36SuicuneScript
 
 	def_bg_events
-	bg_event 33,  1, BGEVENT_JUMPTEXT, Route36TrainerTips2Text
-	bg_event 49, 11, BGEVENT_JUMPTEXT, RuinsOfAlphNorthSignText
-	bg_event 59,  7, BGEVENT_JUMPTEXT, Route36SignText
-	bg_event 25,  7, BGEVENT_JUMPTEXT, Route36TrainerTips1Text
-	bg_event 53,  4, BGEVENT_JUMPTEXT, Route36AdvancedTips1Text
-	bg_event 34,  7, BGEVENT_JUMPTEXT, Route36AdvancedTips2Text
-	bg_event 30, 11, BGEVENT_JUMPSTD, treegrotto, HIDDENGROTTO_ROUTE_36
-	bg_event 31, 11, BGEVENT_JUMPSTD, treegrotto, HIDDENGROTTO_ROUTE_36
+	bg_event 15,  1, BGEVENT_JUMPTEXT, Route36TrainerTips2Text
+	bg_event 31, 11, BGEVENT_JUMPTEXT, RuinsOfAlphNorthSignText
+	bg_event 39,  7, BGEVENT_JUMPTEXT, Route36SignText
+	bg_event  7,  7, BGEVENT_JUMPTEXT, Route36TrainerTips1Text
+	bg_event 33,  4, BGEVENT_JUMPTEXT, Route36AdvancedTips1Text
+	bg_event 16,  7, BGEVENT_JUMPTEXT, Route36AdvancedTips2Text
+	bg_event 12, 11, BGEVENT_JUMPSTD, treegrotto, HIDDENGROTTO_ROUTE_36
+	bg_event 13, 11, BGEVENT_JUMPSTD, treegrotto, HIDDENGROTTO_ROUTE_36
 
 	def_object_events
-	object_event 39,  9, SPRITE_WEIRD_TREE, SPRITEMOVEDATA_SUDOWOODO, 0, 0, -1, 0, OBJECTTYPE_SCRIPT, 0, SudowoodoScript, EVENT_ROUTE_36_SUDOWOODO
-	object_event 53,  6, SPRITE_SCHOOLBOY, SPRITEMOVEDATA_WANDER, 1, 1, -1, 0, OBJECTTYPE_SCRIPT, 0, ArthurScript, EVENT_ROUTE_36_ARTHUR_OF_THURSDAY
-	object_event 37, 12, SPRITE_CUTE_GIRL, SPRITEMOVEDATA_STANDING_DOWN, 0, 0, -1, PAL_NPC_BLUE, OBJECTTYPE_SCRIPT, 0, Route36FloriaScript, EVENT_FLORIA_AT_SUDOWOODO
-	pokemon_event 25,  6, SUICUNE, SPRITEMOVEDATA_POKEMON, -1, PAL_NPC_BLUE, ClearText, EVENT_SAW_SUICUNE_ON_ROUTE_36
-	object_event 30,  6, SPRITE_ACE_TRAINER_F, SPRITEMOVEDATA_STANDING_RIGHT, 0, 0, -1, 0, OBJECTTYPE_SCRIPT, 0, Route36CooltrainerfChiaraScript, -1
-	object_event 24, 13, SPRITE_PSYCHIC, SPRITEMOVEDATA_STANDING_RIGHT, 0, 0, -1, 0, OBJECTTYPE_GENERICTRAINER, 3, GenericTrainerPsychicMark, -1
-	object_event 35, 14, SPRITE_SCHOOLBOY, SPRITEMOVEDATA_STANDING_LEFT, 0, 0, -1, 0, OBJECTTYPE_TRAINER, 5, TrainerSchoolboyAlan1, -1
-	object_event 57,  9, SPRITE_CUTE_GIRL, SPRITEMOVEDATA_WALK_LEFT_RIGHT, 0, 2, -1, PAL_NPC_RED, OBJECTTYPE_SCRIPT, 0, Route36LassScript, -1
-	object_event 48,  9, SPRITE_FAT_GUY, SPRITEMOVEDATA_STANDING_LEFT, 0, 0, -1, PAL_NPC_PURPLE, OBJECTTYPE_SCRIPT, 0, Route36RockSmashGuyScript, -1
-	fruittree_event 25,  4, FRUITTREE_ROUTE_36, RAWST_BERRY, PAL_NPC_TEAL
-	object_event 50,  5, SPRITE_SCHOOLGIRL, SPRITEMOVEDATA_SPINRANDOM_FAST, 0, 0, -1, 0, OBJECTTYPE_GENERICTRAINER, 2, GenericTrainerSchoolgirlMolly, -1
+	object_event 21,  9, SPRITE_WEIRD_TREE, SPRITEMOVEDATA_SUDOWOODO, 0, 0, -1, 0, OBJECTTYPE_SCRIPT, 0, SudowoodoScript, EVENT_ROUTE_36_SUDOWOODO
+	object_event 33,  6, SPRITE_SCHOOLBOY, SPRITEMOVEDATA_WANDER, 1, 1, -1, 0, OBJECTTYPE_SCRIPT, 0, ArthurScript, EVENT_ROUTE_36_ARTHUR_OF_THURSDAY
+	object_event 19, 12, SPRITE_CUTE_GIRL, SPRITEMOVEDATA_STANDING_DOWN, 0, 0, -1, PAL_NPC_BLUE, OBJECTTYPE_SCRIPT, 0, Route36FloriaScript, EVENT_FLORIA_AT_SUDOWOODO
+	pokemon_event  7,  6, SUICUNE, SPRITEMOVEDATA_POKEMON, -1, PAL_MON_AZURE, ClearText, EVENT_SAW_SUICUNE_ON_ROUTE_36
+	object_event 12,  6, SPRITE_ACE_TRAINER_F, SPRITEMOVEDATA_STANDING_RIGHT, 0, 0, -1, 0, OBJECTTYPE_SCRIPT, 0, Route36CooltrainerfChiaraScript, -1
+	object_event  6, 13, SPRITE_PSYCHIC, SPRITEMOVEDATA_STANDING_RIGHT, 0, 0, -1, 0, OBJECTTYPE_GENERICTRAINER, 3, GenericTrainerPsychicMark, -1
+	object_event 17, 14, SPRITE_SCHOOLBOY, SPRITEMOVEDATA_STANDING_LEFT, 0, 0, -1, 0, OBJECTTYPE_TRAINER, 5, TrainerSchoolboyAlan1, -1
+	object_event 37,  9, SPRITE_CUTE_GIRL, SPRITEMOVEDATA_WALK_LEFT_RIGHT, 0, 2, -1, PAL_NPC_RED, OBJECTTYPE_SCRIPT, 0, Route36LassScript, -1
+	object_event 28,  9, SPRITE_FAT_GUY, SPRITEMOVEDATA_STANDING_LEFT, 0, 0, -1, PAL_NPC_PURPLE, OBJECTTYPE_SCRIPT, 0, Route36RockSmashGuyScript, -1
+	fruittree_event  7,  4, FRUITTREE_ROUTE_36, RAWST_BERRY, PAL_NPC_TEAL
+	object_event 30,  5, SPRITE_SCHOOLGIRL, SPRITEMOVEDATA_SPINRANDOM_FAST, 0, 0, -1, 0, OBJECTTYPE_GENERICTRAINER, 2, GenericTrainerSchoolgirlMolly, -1
 
 	object_const_def
 	const ROUTE36_WEIRD_TREE
@@ -66,9 +68,9 @@ Route36SuicuneScript:
 	disappear ROUTE36_SUICUNE
 	turnobject PLAYER, DOWN
 	pause 10
-	setscene $0
+	setscene SCENE_ROUTE36_NOOP
 	clearevent EVENT_SAW_SUICUNE_AT_CIANWOOD_CITY
-	setmapscene CIANWOOD_CITY, $1
+	setmapscene CIANWOOD_CITY, SCENE_CIANWOODCITY_SUICUNE_AND_EUSINE
 	end
 
 SudowoodoScript:
@@ -130,7 +132,32 @@ Route36FloriaScript:
 	iftrue_jumptextfaceplayer FloriaTextAfterSudowoodo
 	checkevent EVENT_GOT_SQUIRTBOTTLE
 	iftrue_jumptextfaceplayer FloriaTextAfterSquirtBottle
-	jumptextfaceplayer FloriaTextAfterPlainBadge
+	jumpthistextfaceplayer
+
+	text "I'm the Flower"
+	line "Shop's Floria!"
+
+	para "Listen, listen!"
+
+	para "When I sprinkled"
+	line "water on that"
+
+	para "wiggly tree, it"
+	line "jumped right up!"
+
+	para "It just has to be"
+	line "a #mon."
+
+	para "I bet it would be"
+	line "shocked out of its"
+
+	para "disguise if you"
+	line "soaked it!"
+
+	para "I know! I'll tell"
+	line "my sis and borrow"
+	cont "her water bottle!"
+	done
 
 Route36RockSmashGuyScript:
 	faceplayer
@@ -139,7 +166,19 @@ Route36RockSmashGuyScript:
 	iftruefwd .AlreadyGotRockSmash
 	checkevent EVENT_FOUGHT_SUDOWOODO
 	iftruefwd .ClearedSudowoodo
-	jumpopenedtext RockSmashGuyText1
+	jumpthisopenedtext
+
+	text "Wa-hey!"
+
+	para "I was going to"
+	line "snap that tree"
+
+	para "with my straight-"
+	line "arm punch."
+
+	para "But I couldn't!"
+	line "I'm a failure!"
+	done
 
 .ClearedSudowoodo:
 	writetext RockSmashGuyText2
@@ -147,12 +186,45 @@ Route36RockSmashGuyScript:
 	verbosegivetmhm TM_ROCK_SMASH
 	setevent EVENT_GOT_TM50_ROCK_SMASH
 .AlreadyGotRockSmash:
-	jumpopenedtext RockSmashGuyText3
+	jumpthisopenedtext
+
+	text "That happens to be"
+if DEF(FAITHFUL)
+	line "Rock Smash."
+else
+	line "Brick Break."
+endc
+
+	para "You can shatter"
+	line "rocks with just a"
+
+	para "single well-aimed"
+	line "smack."
+
+	para "If any rocks are"
+	line "in your way, just"
+if DEF(FAITHFUL)
+	cont "smash 'em up!"
+else
+	cont "break 'em up!"
+endc
+	done
 
 Route36LassScript:
 	checkevent EVENT_FOUGHT_SUDOWOODO
 	iftrue_jumptextfaceplayer Route36LassText_ClearedSudowoodo
-	jumptextfaceplayer Route36LassText_OddTree
+	jumpthistextfaceplayer
+
+	text "An odd tree is"
+	line "blocking the way"
+	cont "to Goldenrod City."
+
+	para "I wanted to go see"
+	line "the huge #mon"
+
+	para "Center they just"
+	line "opened…"
+	done
 
 TrainerSchoolboyAlan1:
 	trainer SCHOOLBOY, ALAN1, EVENT_BEAT_SCHOOLBOY_ALAN, SchoolboyAlan1SeenText, SchoolboyAlan1BeatenText, 0, .Script
@@ -246,8 +318,7 @@ TrainerSchoolboyAlan1:
 
 .GiveFireStone:
 	callstd giftm
-	verbosegiveitem FIRE_STONE
-	iffalsefwd .BagFull
+	verbosegiveitem FIRE_STONE, iffalsefwd .BagFull
 	clearflag ENGINE_ALAN_HAS_FIRE_STONE
 	setevent EVENT_ALAN_GAVE_FIRE_STONE
 	jumpstd numberacceptedm
@@ -301,8 +372,7 @@ Route36CooltrainerfChiaraScript:
 	opentext
 	writetext .AfterText1
 	promptbutton
-	verbosegiveitem BINDING_BAND
-	iffalse_endtext
+	verbosegiveitem BINDING_BAND, iffalse_endtext
 	setevent EVENT_GOT_BINDING_BAND_FROM_ROUTE_36_LEADER
 	jumpthisopenedtext
 
@@ -411,10 +481,19 @@ ArthurScript:
 .MetArthur:
 	writetext ArthurGivesGiftText
 	promptbutton
-	verbosegiveitem HARD_STONE
-	iffalsefwd .BagFull
+	verbosegiveitem HARD_STONE, iffalsefwd .BagFull
 	setevent EVENT_GOT_HARD_STONE_FROM_ARTHUR
-	jumpopenedtext ArthurGaveGiftText
+	jumpthisopenedtext
+
+	text "Arthur: A #mon"
+	line "that uses Rock-"
+
+	para "type moves should"
+	line "hold on to that."
+
+	para "It pumps up Rock-"
+	line "type attacks."
+	done
 
 .AlreadyGotStone:
 	writetext ArthurThursdayText
@@ -423,7 +502,12 @@ ArthurScript:
 	endtext
 
 ArthurNotThursdayScript:
-	jumpopenedtext ArthurNotThursdayText
+	jumpthisopenedtext
+
+	text "Arthur: Today's"
+	line "not Thursday. How"
+	cont "disappointing."
+	done
 
 WeirdTreeMovement_Flee:
 	fast_jump_step_up
@@ -483,31 +567,6 @@ SudowoodoAttackedText:
 	line "attacked!"
 	done
 
-FloriaTextAfterPlainBadge:
-	text "I'm the Flower"
-	line "Shop's Floria!"
-
-	para "Listen, listen!"
-
-	para "When I sprinkled"
-	line "water on that"
-
-	para "wiggly tree, it"
-	line "jumped right up!"
-
-	para "It just has to be"
-	line "a #mon."
-
-	para "I bet it would be"
-	line "shocked out of its"
-
-	para "disguise if you"
-	line "soaked it!"
-
-	para "I know! I'll tell"
-	line "my sis and borrow"
-	cont "her water bottle!"
-	done
 
 FloriaTextAfterSquirtBottle:
 	text "I'm the Flower"
@@ -552,18 +611,6 @@ FloriaTextAfterSudowoodo:
 	para "Ta-ta!"
 	done
 
-RockSmashGuyText1:
-	text "Wa-hey!"
-
-	para "I was going to"
-	line "snap that tree"
-
-	para "with my straight-"
-	line "arm punch."
-
-	para "But I couldn't!"
-	line "I'm a failure!"
-	done
 
 RockSmashGuyText2:
 	text "Did you clear that"
@@ -574,40 +621,7 @@ RockSmashGuyText2:
 	cont "have this."
 	done
 
-RockSmashGuyText3:
-	text "That happens to be"
-if DEF(FAITHFUL)
-	line "Rock Smash."
-else
-	line "Brick Break."
-endc
 
-	para "You can shatter"
-	line "rocks with just a"
-
-	para "single well-aimed"
-	line "smack."
-
-	para "If any rocks are"
-	line "in your way, just"
-if DEF(FAITHFUL)
-	cont "smash 'em up!"
-else
-	cont "break 'em up!"
-endc
-	done
-
-Route36LassText_OddTree:
-	text "An odd tree is"
-	line "blocking the way"
-	cont "to Goldenrod City."
-
-	para "I wanted to go see"
-	line "the huge #mon"
-
-	para "Center they just"
-	line "opened…"
-	done
 
 Route36LassText_ClearedSudowoodo:
 	text "That odd tree dis-"
@@ -670,16 +684,6 @@ ArthurGivesGiftText:
 	line "this."
 	done
 
-ArthurGaveGiftText:
-	text "Arthur: A #mon"
-	line "that uses Rock-"
-
-	para "type moves should"
-	line "hold on to that."
-
-	para "It pumps up Rock-"
-	line "type attacks."
-	done
 
 ArthurThursdayText:
 	text "Arthur: I'm Arthur"
@@ -689,11 +693,6 @@ ArthurThursdayText:
 	line "of seven children."
 	done
 
-ArthurNotThursdayText:
-	text "Arthur: Today's"
-	line "not Thursday. How"
-	cont "disappointing."
-	done
 
 Route36SignText:
 	text "Route 36"
@@ -738,10 +737,12 @@ Route36TrainerTips2Text:
 Route36AdvancedTips1Text:
 	text "Advanced Tips!"
 
+	assert NUM_FRAMES == 20
 	para "You can pick from"
 	line "twenty different"
 	cont "textbox frames and"
 
+	assert NUM_FONTS == 8
 	para "eight different"
 	line "text typefaces in"
 	cont "the Options!"

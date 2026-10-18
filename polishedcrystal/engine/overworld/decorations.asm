@@ -11,16 +11,16 @@ _PlayerDecorationMenu:
 	ld hl, .MenuHeader
 	call LoadMenuHeader
 	xor a
-	ld [wBuffer5], a
+	ld [wChangedDecorations], a
 	ld a, $1
-	ld [wBuffer6], a
+	ld [wCurDecorationCategory], a
 .top_loop
-	ld a, [wBuffer6]
+	ld a, [wCurDecorationCategory]
 	ld [wMenuCursorBuffer], a
 	call .FindCategoriesWithOwnedDecos
 	call DoNthMenu
 	ld a, [wMenuCursorY]
-	ld [wBuffer6], a
+	ld [wCurDecorationCategory], a
 	jr c, .exit_menu
 	ld a, [wMenuSelection]
 	ld hl, .category_pointers
@@ -31,7 +31,7 @@ _PlayerDecorationMenu:
 	call ExitMenu
 	pop af
 	ld [wWhichIndexSet], a
-	ld a, [wBuffer5]
+	ld a, [wChangedDecorations]
 	ld c, a
 	ret
 
@@ -370,6 +370,7 @@ PopulateDecoCategoryMenu:
 	ld hl, .ScrollingMenuHeader
 	call CopyMenuHeader
 	xor a
+	assert NO_BG_MAP_TRANSFER == 0
 	ldh [hBGMapMode], a
 	call InitScrollingMenu
 	xor a
@@ -386,9 +387,7 @@ PopulateDecoCategoryMenu:
 
 .NothingToChooseText:
 	; There's nothing to choose.
-	text_far _NothingToChooseText
-	text_end
-
+	text_farend _NothingToChooseText
 .NonscrollingMenuHeader:
 	db MENU_BACKUP_TILES
 	menu_coords 0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1
@@ -656,12 +655,12 @@ DecoAction_putawaybigdoll:
 
 DecoAction_TrySetItUp:
 	ld a, [hl]
-	ld [wBuffer1], a
+	ld [wCurDecoration], a
 	push hl
 	call DecoAction_SetItUp
 	jr c, .failed
 	ld a, 1
-	ld [wBuffer5], a
+	ld [wChangedDecorations], a
 	pop hl
 	ld a, [wMenuSelection]
 	ld [hl], a
@@ -675,7 +674,7 @@ DecoAction_TrySetItUp:
 
 DecoAction_SetItUp:
 ; See if there's anything of the same type already out
-	ld a, [wBuffer1]
+	ld a, [wCurDecoration]
 	and a
 	jr z, .nothingthere
 ; See if that item is already out
@@ -687,7 +686,7 @@ DecoAction_SetItUp:
 	ld a, [wMenuSelection]
 	ld hl, wStringBuffer4
 	call GetDecorationName
-	ld a, [wBuffer1]
+	ld a, [wCurDecoration]
 	ld hl, wStringBuffer3
 	call GetDecorationName
 	ld hl, DecoText_PutAwayAndSetUp
@@ -713,16 +712,16 @@ DecoAction_SetItUp:
 DecoAction_TryPutItAway:
 ; If there is no item of that type already set, there is nothing to put away.
 	ld a, [hl]
-	ld [wBuffer1], a
+	ld [wCurDecoration], a
 	xor a
 	ld [hl], a
-	ld a, [wBuffer1]
+	ld a, [wCurDecoration]
 	and a
 	jr z, .nothingthere
 ; Put it away.
 	ld a, $1
-	ld [wBuffer5], a
-	ld a, [wBuffer1]
+	ld [wChangedDecorations], a
+	ld a, [wCurDecoration]
 	ld [wMenuSelection], a
 	ld hl, wStringBuffer3
 	call GetDecorationName
@@ -744,7 +743,7 @@ DecoAction_setupornament:
 	call DecoAction_SetItUp_Ornament
 	jr c, .cancel
 	ld a, $1
-	ld [wBuffer5], a
+	ld [wChangedDecorations], a
 	jr DecoAction_FinishUp_Ornament
 
 .cancel
@@ -764,15 +763,15 @@ DecoAction_putawayornament:
 
 DecoAction_FinishUp_Ornament:
 	call QueryWhichSide
-	ld a, [wBuffer3]
+	ld a, [wSelectedDecoration]
 	ld [hl], a
-	ld a, [wBuffer4]
+	ld a, [wOtherDecoration]
 	ld [de], a
 	xor a
 	ret
 
 DecoAction_SetItUp_Ornament:
-	ld a, [wBuffer3]
+	ld a, [wSelectedDecoration]
 	and a
 	jr z, .nothingthere
 	ld b, a
@@ -786,7 +785,7 @@ DecoAction_SetItUp_Ornament:
 	ld hl, wStringBuffer4
 	call GetDecorationName
 	ld a, [wMenuSelection]
-	ld [wBuffer3], a
+	ld [wSelectedDecoration], a
 	call .getwhichside
 	ld hl, DecoText_PutAwayAndSetUp
 	call MenuTextboxBackup
@@ -795,7 +794,7 @@ DecoAction_SetItUp_Ornament:
 
 .nothingthere
 	ld a, [wMenuSelection]
-	ld [wBuffer3], a
+	ld [wSelectedDecoration], a
 	call .getwhichside
 	ld a, [wMenuSelection]
 	ld hl, wStringBuffer3
@@ -814,27 +813,25 @@ DecoAction_SetItUp_Ornament:
 .getwhichside
 	ld a, [wMenuSelection]
 	ld b, a
-	ld a, [wBuffer4]
+	ld a, [wOtherDecoration]
 	cp b
 	ret nz
 	xor a
-	ld [wBuffer4], a
+	ld [wOtherDecoration], a
 	ret
 
 WhichSidePutOnText:
-	text_far _WhichSidePutOnText
-	text_end
-
+	text_farend _WhichSidePutOnText
 DecoAction_PutItAway_Ornament:
-	ld a, [wBuffer3]
+	ld a, [wSelectedDecoration]
 	and a
 	jr z, .nothingthere
 	ld hl, wStringBuffer3
 	call GetDecorationName
 	ld a, $1
-	ld [wBuffer5], a
+	ld [wChangedDecorations], a
 	xor a
-	ld [wBuffer3], a
+	ld [wSelectedDecoration], a
 	ld hl, DecoText_PutAwayTheDeco
 	call MenuTextboxBackup
 	xor a
@@ -847,9 +844,7 @@ DecoAction_PutItAway_Ornament:
 	ret
 
 WhichSidePutAwayText:
-	text_far _WhichSidePutAwayText
-	text_end
-
+	text_farend _WhichSidePutAwayText
 DecoAction_AskWhichSide:
 	call MenuTextbox
 	ld hl, WhichSideMenuHeader
@@ -860,12 +855,12 @@ DecoAction_AskWhichSide:
 	ld a, [wMenuCursorY]
 	cp 3
 	jr z, .nope
-	ld [wBuffer2], a
+	ld [wSelectedDecorationSide], a
 	call QueryWhichSide
 	ld a, [hl]
-	ld [wBuffer3], a
+	ld [wSelectedDecoration], a
 	ld a, [de]
-	ld [wBuffer4], a
+	ld [wOtherDecoration], a
 	xor a
 	ret
 
@@ -876,7 +871,7 @@ DecoAction_AskWhichSide:
 QueryWhichSide:
 	ld hl, wDecoRightOrnament
 	ld de, wDecoLeftOrnament
-	ld a, [wBuffer2]
+	ld a, [wSelectedDecorationSide]
 	dec a
 	ret z
 	jmp SwapHLDE
@@ -896,25 +891,15 @@ WhichSideMenuData:
 
 DecoText_PutAwayTheDeco:
 	; Put away the @ .
-	text_far _PutAwayTheDecoText
-	text_end
-
+	text_farend _PutAwayTheDecoText
 DecoText_NothingToPutAway:
-	text_far _NothingToPutAwayText
-	text_end
-
+	text_farend _NothingToPutAwayText
 DecoText_SetUpTheDeco:
-	text_far _SetUpTheDecoText
-	text_end
-
+	text_farend _SetUpTheDecoText
 DecoText_PutAwayAndSetUp:
-	text_far _PutAwayAndSetUpText
-	text_end
-
+	text_farend _PutAwayAndSetUpText
 DecoText_AlreadySetUp:
-	text_far _AlreadySetUpText
-	text_end
-
+	text_farend _AlreadySetUpText
 DescribeDecoration::
 	ld a, b
 	call StackJumpTable

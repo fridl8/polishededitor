@@ -23,7 +23,7 @@ Credits::
 	call ClearSprites
 
 	ld hl, wCreditsBlankFrame2bpp
-	ld c, $80
+	ld c, (16 tiles) / 2
 	lb de, %11111111, %00000000 ; solid light gray hue
 
 .load_loop
@@ -50,10 +50,16 @@ Credits::
 	xor a
 	ld [wCreditsLYOverride], a
 
+	ldh a, [rWBK]
+	push af
+	ld a, BANK(wLYOverrides)
+	ldh [rWBK], a
 	ld hl, wLYOverrides
 	ld bc, $100
 	xor a
 	rst ByteFill
+	pop af
+	ldh [rWBK], a
 
 	ld hl, rIE
 	set B_IE_STAT, [hl]
@@ -69,6 +75,7 @@ Credits::
 	ld a, $1
 	ldh [hInMenu], a
 	xor a
+	assert NO_BG_MAP_TRANSFER == 0
 	ldh [hBGMapMode], a
 	ld [wCreditsPos], a
 	ld [wCreditsPos+1], a
@@ -156,6 +163,7 @@ Credits_LoopBack:
 
 Credits_PrepBGMapUpdate:
 	xor a
+	assert NO_BG_MAP_TRANSFER == 0
 	ldh [hBGMapMode], a
 	; fallthrough
 
@@ -178,6 +186,7 @@ Credits_UpdateGFXRequestPath:
 
 Credits_RequestGFX:
 	xor a
+	assert NO_BG_MAP_TRANSFER == 0
 	ldh [hBGMapMode], a
 	ld a, $8
 	ldh [hRequested2bpp], a
@@ -187,6 +196,10 @@ Credits_LYOverride:
 	ldh a, [rLY]
 	cp $30
 	jr c, Credits_LYOverride
+	ldh a, [rWBK]
+	push af
+	ld a, BANK(wLYOverrides)
+	ldh [rWBK], a
 	ld a, [wCreditsLYOverride]
 	dec a
 	dec a
@@ -195,6 +208,8 @@ Credits_LYOverride:
 	call .Fill
 	ld hl, wLYOverrides + $87
 	call .Fill
+	pop af
+	ldh [rWBK], a
 	jr Credits_Next
 
 .Fill:
@@ -224,6 +239,7 @@ ParseCredits:
 ; First, let's clear the current text display,
 ; starting from line 5.
 	xor a
+	assert NO_BG_MAP_TRANSFER == 0
 	ldh [hBGMapMode], a
 	hlcoord 0, 5
 	ld bc, 20 * 12
@@ -344,7 +360,7 @@ ParseCredits:
 
 	xor a
 	ldh [hBGMapHalf], a
-	ld a, 1
+	ld a, TRANSFER_TILEMAP
 	ldh [hBGMapMode], a
 
 .done
@@ -385,6 +401,7 @@ ParseCredits:
 
 ConstructCreditsTilemap:
 	xor a
+	assert NO_BG_MAP_TRANSFER == 0
 	ldh [hBGMapMode], a
 	ld a, $c
 	ldh [hBGMapAddress], a
@@ -429,6 +446,7 @@ ConstructCreditsTilemap:
 
 	call ApplyAttrAndTilemapInVBlank
 	xor a
+	assert NO_BG_MAP_TRANSFER == 0
 	ldh [hBGMapMode], a
 	ldh [hBGMapAddress], a
 	hlcoord 0, 0
@@ -600,7 +618,7 @@ DecompressCreditsGFX:
 
 	ld hl, CopyrightGFX
 	ld de, vTiles2 tile $60
-	lb bc, BANK(CopyrightGFX), $1d
+	lb bc, BANK(CopyrightGFX), $1e
 	call DecompressRequest2bpp
 
 	ld a, [wCreditsSpawn]

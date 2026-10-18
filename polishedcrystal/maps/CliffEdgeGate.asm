@@ -33,14 +33,26 @@ ProfOaksAide3Script:
 .HereYouGo
 	writetext ProfOaksAide3HereYouGoText
 	waitbutton
-	verbosegiveitem MACHO_BRACE
-	iffalsefwd .NoRoom
+	verbosegiveitem MACHO_BRACE, iffalsefwd .NoRoom
 	setevent EVENT_GOT_MACHO_BRACE_FROM_PROF_OAKS_AIDE
 .Explain
-	jumpopenedtext ProfOaksAide3ExplainText
+	jumpthisopenedtext
+
+	text "That Macho Brace"
+	line "helps a #mon"
+
+	para "grow more from"
+	line "battling, but"
+	cont "slows it down."
+	done
 
 .NoRoom
-	jumpopenedtext ProfOaksAide3NoRoomText
+	jumpthisopenedtext
+
+	text "Oh! I see you"
+	line "don't have any"
+	cont "room for this."
+	done
 
 GenericTrainerGruntM12:
 	generictrainer GRUNTM, 12, EVENT_BEAT_ROCKET_GRUNTM_12, GruntM12SeenText, GruntM12BeatenText
@@ -105,20 +117,7 @@ ProfOaksAide3HereYouGoText:
 	line "Here you go!"
 	done
 
-ProfOaksAide3NoRoomText:
-	text "Oh! I see you"
-	line "don't have any"
-	cont "room for this."
-	done
 
-ProfOaksAide3ExplainText:
-	text "That Macho Brace"
-	line "helps a #mon"
-
-	para "grow more from"
-	line "battling, but"
-	cont "slows it down."
-	done
 
 GruntM12SeenText:
 	text "You're curious"
@@ -132,4 +131,3 @@ GruntM12BeatenText:
 	text "You were supposed"
 	line "to lose!"
 	done
-

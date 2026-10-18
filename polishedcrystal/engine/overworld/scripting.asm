@@ -276,6 +276,10 @@ RunScriptCommand:
 	dw Script_setquantity                ; d9
 	dw Script_pluralize                  ; da
 	dw Script_loadtrainerwithpal         ; db
+	dw Script_nooryes                    ; dc
+	dw Script_digmod                     ; dd
+	dw Script_toggleevent                ; de
+	dw Script_usepaletteswap             ; df
 	assert_table_length NUM_EVENT_COMMANDS
 
 GetScriptWordDE::
@@ -497,8 +501,13 @@ Script_promptbutton:
 	ldh [hOAMUpdate], a
 	ret
 
+Script_nooryes:
+	call NoYesBox
+	jr _FinishYesNoScript
+
 Script_yesorno:
 	call YesNoBox
+_FinishYesNoScript:
 	; a = carry (no) ? FALSE : TRUE
 	sbc a
 	inc a
@@ -527,11 +536,8 @@ Script_pokepic:
 	; While we actually have species+form stored right now if zero, we need to
 	; handle color variation. Thus, notify Pokepic that we want a partymon.
 	ld a, -1
+	call nz, GetScriptByte
 	ld [wCurForm], a
-	jr z, .pokepic
-	call GetScriptByte
-	ld [wCurForm], a
-.pokepic
 	farjp Pokepic
 
 GetCurPartyMonSpeciesIfZero:
@@ -589,6 +595,7 @@ Script_verbosegiveitem:
 	jmp ScriptCall
 
 GiveItemScript:
+	writemem hScriptVar + 1
 	readmem wItemQuantityChangeBuffer
 	ifequalfwd 1, .OneItem
 	pluralize wStringBuffer4
@@ -599,6 +606,7 @@ GiveItemScript:
 	; fallthrough
 .FinishGiveItem:
 	special ShowItemIcon
+	readmem hScriptVar + 1
 	iffalsefwd .Full
 	specialsound
 	waitbutton
@@ -672,22 +680,16 @@ GetPocketName:
 INCLUDE "data/items/pocket_names.asm"
 
 GetKeyItemPocketName:
-	ld hl, KeyPocketName
+	ld hl, ItemPocketNames.Key
 	jr CopySpecialPocketName
 
-KeyPocketName:
-	db "Key Pocket@"
-
 GetTMHMPocketName:
-	ld hl, TMHMPocketName
+	ld hl, ItemPocketNames.TM
 CopySpecialPocketName:
 	ld d, h
 	ld e, l
 	ld hl, wStringBuffer3
 	jmp CopyName2
-
-TMHMPocketName:
-	db "TM Pocket@"
 
 Script_pokemart:
 	call Script_faceplayer
@@ -1031,7 +1033,7 @@ ApplyObjectFacing::
 	hlcoord 0, 0
 	ld bc, SCREEN_AREA
 .loop
-	res 7, [hl]
+	res B_BG_PRIO, [hl]
 	inc hl
 	dec bc
 	ld a, b
@@ -1221,7 +1223,7 @@ Script_loadtrainer:
 	ld [wOtherTrainerClass], a
 	call GetScriptByte
 	ld [wOtherTrainerID], a
-	xor a
+	xor a ; TRAINERPAL_NONE
 	ld [wTrainerPal], a
 	ret
 
@@ -1237,8 +1239,11 @@ Script_loadtrainerwithpal:
 	ret
 
 Script_startbattle:
+	; Any other battle ends a DexNav hunt (D16). The map reload afterwards
+	; would otherwise bring the rustle back.
+	farcall DexNav_EndHunt
 	call BufferScreen
-	predef StartBattle
+	farcall StartBattle
 	ld a, [wBattleResult]
 	and ~BATTLERESULT_BITMASK
 	ldh [hScriptVar], a
@@ -1618,9 +1623,9 @@ Script_random16:
 	or c
 	ret z
 	call RandomRange16
-	ld b, a
+	ld a, b
 	ldh [hScriptVar], a
-	ld c, a
+	ld a, c
 	ldh [hScriptVar+1], a
 	ret
 
@@ -2045,13 +2050,10 @@ Script_checkcellnum:
 Script_specialphonecall:
 	call GetScriptByte
 	ld [wSpecialPhoneCallID], a
-	xor a
-	ld [wSpecialPhoneCallID + 1], a
 	ret
 
 Script_checkphonecall:
 ; returns false if no special phone call is stored
-
 	ld a, [wSpecialPhoneCallID]
 	and a
 	jr z, .ok
@@ -2131,6 +2133,25 @@ Script_checkevent:
 	jr z, .false
 	ld a, TRUE
 .false
+	ldh [hScriptVar], a
+	ret
+
+Script_toggleevent:
+	call GetScriptWordDE
+	ld b, CHECK_FLAG
+	push de
+	call EventFlagAction
+	pop de
+	jr z, .false
+	ld b, RESET_FLAG
+	call EventFlagAction
+	xor a
+	jr .done
+.false
+	ld b, SET_FLAG
+	call EventFlagAction
+	ld a, TRUE
+.done
 	ldh [hScriptVar], a
 	ret
 
@@ -2218,6 +2239,15 @@ Script_warpmod:
 	ld [wBackupMapNumber], a
 	ret
 
+Script_digmod:
+	call GetScriptByte
+	ld [wDigWarpNumber], a
+	call GetScriptByte
+	ld [wDigMapGroup], a
+	call GetScriptByte
+	ld [wDigMapNumber], a
+	ret
+
 Script_blackoutmod:
 	call GetScriptByte
 	ld [wLastSpawnMapGroup], a
@@ -2235,6 +2265,13 @@ Script_usestonetable:
 	ld [wStoneTableAddress], a
 	call GetScriptByte
 	ld [wStoneTableAddress+1], a
+	ret
+
+Script_usepaletteswap:
+	call GetScriptByte
+	ld [wPaletteSwapAddress], a
+	call GetScriptByte
+	ld [wPaletteSwapAddress+1], a
 	ret
 
 Script_changemapblocks:
@@ -2261,6 +2298,7 @@ Script_changeblock:
 
 Script_refreshmap::
 	xor a
+	assert NO_BG_MAP_TRANSFER == 0
 	ldh [hBGMapMode], a
 	call LoadMapPart
 	call GetMovementPermissions
@@ -2462,7 +2500,7 @@ Script_verbosegivetmhm:
 	; off by one error?
 	ld hl, wTempTMHM
 	inc [hl]
-	predef GetTMHMMove
+	farcall GetTMHMMove
 	ld b, BANK(GiveTMHMScript)
 	ld de, GiveTMHMScript
 	jmp ScriptCall
@@ -2486,6 +2524,11 @@ Script_tmhmnotify:
 	; the "▶" needed by the right cursor arrow.
 	farjp LoadFonts_NoOAMUpdate
 
+GetCurTMHMName:
+	ld a, [wCurTMHM]
+	ld [wNamedObjectIndex], a
+	jmp GetTMHMName
+
 Script_gettmhmname:
 	call GetScriptByte
 	and a
@@ -2502,7 +2545,7 @@ Script_gettmhmname:
 	inc a
 	ld [wTempTMHM], a
 
-	predef GetTMHMMove
+	farcall GetTMHMMove
 	ld a, [wTempTMHM]
 	ld [wPutativeTMHMMove], a
 	call GetMoveName

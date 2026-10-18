@@ -96,6 +96,12 @@ _HowManyShouldIMakeText::
 	line "make?"
 	done
 
+SECTION "_HowManyDoYouWantToSellText", ROMX
+_HowManyDoYouWantToSellText::
+	text "How many do you"
+	line "want to sell?"
+	done
+
 SECTION "_RecoveredSomeHPText", ROMX
 _RecoveredSomeHPText::
 	text_ram wStringBuffer1
@@ -649,12 +655,6 @@ OPT_Speedy::
 SECTION "_OPT_PokemonChannelText", ROMX
 _OPT_PokemonChannelText::
 	text "#mon"
-	done
-
-SECTION "_PokedexShowText", ROMX
-_PokedexShowText::
-	line ""
-	text_ram wStringBuffer1
 	done
 
 ; Pokémon Music Channel / Pokémusic
@@ -2131,7 +2131,9 @@ _RodBiteText::
 SECTION "_RodNothingText", ROMX
 _RodNothingText::
 	text "Not even a nibble!"
-	prompt
+
+	para "Keep fishing?"
+	done
 
 SECTION "_CantGetOffBikeText", ROMX
 _CantGetOffBikeText::
@@ -2979,16 +2981,6 @@ _OakPCText4::
 	line "Oak's PC closed."
 	done
 
-SECTION "_MemoryGameYeahText", ROMX
-_MemoryGameYeahText::
-	text " , yeah!"
-	done
-
-SECTION "_MemoryGameDarnText", ROMX
-_MemoryGameDarnText::
-	text "Darn…"
-	done
-
 SECTION "_StartMenuContestEndText", ROMX
 _StartMenuContestEndText::
 	text "Would you like to"
@@ -3343,17 +3335,6 @@ _SaveFileCorruptedText::
 	text "The save file is"
 	line "corrupted!"
 	prompt
-
-SECTION "_WindowPoppingErrorText", ROMX
-_WindowPoppingErrorText::
-	text "No windows avail-"
-	line "able for popping."
-	done
-
-SECTION "_ObjectEventText", ROMX
-_ObjectEventText::
-	text "Object event"
-	done
 
 SECTION "_GainedItemText", ROMX
 _GainedItemText::

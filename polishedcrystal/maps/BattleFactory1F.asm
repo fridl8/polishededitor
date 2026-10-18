@@ -1,12 +1,13 @@
 BattleFactory1F_MapScriptHeader:
 	def_scene_scripts
-	scene_script BattleFactory1FContinueChallenge
+	scene_script BattleFactory1FContinueChallenge, SCENE_BATTLEFACTORY1F_CHECKSTATE
+	scene_const SCENE_BATTLEFACTORY1F_NOOP
 
 	def_callbacks
 
 	def_warp_events
 	warp_event 12, 11, VERMILION_CITY, 15
-	warp_event 13, 11, VERMILION_CITY, 16
+	warp_event 13, 11, VERMILION_CITY, 15
 	warp_event 12,  1, BATTLE_FACTORY_HALLWAY, 1
 
 	def_coord_events
@@ -29,7 +30,7 @@ BattleFactory1F_MapScriptHeader:
 BattleFactory1FContinueChallenge:
 ; Triggers (usefully) if we're in an ongoing Battle Factory run.
 	; Only trigger this once.
-	setscene 1
+	setscene SCENE_BATTLEFACTORY1F_NOOP
 
 	; Check current battle status to see if we need to resume or reset winstreak
 	special Special_BattleTower_GetChallengeState
@@ -92,7 +93,8 @@ BattleFactory1FContinueChallenge:
 		para "For that, you get"
 		line "this great prize!"
 		prompt
-	verbosegiveitem MINT_LEAF
+	; Commit the challenge result even if the Bag cannot fit the prize.
+	verbosegiveitem_unsafe MINT_LEAF
 	; fallthrough
 Script_CommitBattleFactoryResult:
 	special Special_BattleTower_CommitChallengeResult
@@ -203,7 +205,7 @@ BattleFactory1FReceptionistScript:
 	; fallthrough
 .BattleFactoryMenu:
 	; Setscene here in case the player aborted a quicksave prompted by challenge
-	setscene $1
+	setscene SCENE_BATTLEFACTORY1F_NOOP
 	writethistext
 		text "Want to head onto"
 		line "the Battle Floor?"
@@ -232,7 +234,7 @@ BattleFactory1FReceptionistScript:
 	; Done here to ensure it's saved in case the player resets later.
 	; The scene script running after the player saves but before the
 	; challenge starts is harmless since there's no challenge prepared.
-	setscene 0
+	setscene SCENE_BATTLEFACTORY1F_CHECKSTATE
 	special Special_TryQuickSave
 	iffalse .BattleFactoryMenu
 
@@ -247,7 +249,7 @@ BattleFactory1FReceptionistScript:
 	; fallthrough
 Script_ReturnToRentalChallenge:
 	; From this point onwards, resetting the game should count as a streak loss
-	setscene 0
+	setscene SCENE_BATTLEFACTORY1F_CHECKSTATE
 	setval BATTLETOWER_CHALLENGE_IN_PROGRESS
 	special Special_BattleTower_SetChallengeState
 

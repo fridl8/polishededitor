@@ -1,5 +1,9 @@
 Route32_MapScriptHeader:
 	def_scene_scripts
+	scene_const SCENE_ROUTE32_COOLTRAINER_M_BLOCKS
+	scene_const SCENE_ROUTE32_LYRA_GROTTOES
+	scene_const SCENE_ROUTE32_OFFER_SLOWPOKETAIL
+	scene_const SCENE_ROUTE32_NOOP
 
 	def_callbacks
 	callback MAPCALLBACK_NEWMAP, Route32FlyPoint
@@ -13,12 +17,12 @@ Route32_MapScriptHeader:
 	warp_event  4, 24, HIDDEN_TREE_GROTTO, 1
 
 	def_coord_events
-	coord_event 18,  8, 0, Route32CooltrainerMStopsYou
-	coord_event 10, 24, 1, Route32LyraIntroducesHiddenGrottoes1
-	coord_event 11, 24, 1, Route32LyraIntroducesHiddenGrottoes2
-	coord_event 12, 24, 1, Route32LyraIntroducesHiddenGrottoes3
-	coord_event 13, 24, 1, Route32LyraIntroducesHiddenGrottoes4
-	coord_event  7, 71, 2, Route32WannaBuyASlowpokeTailScript
+	coord_event 18,  8, SCENE_ROUTE32_COOLTRAINER_M_BLOCKS, Route32CooltrainerMStopsYou
+	coord_event 10, 24, SCENE_ROUTE32_LYRA_GROTTOES, Route32LyraIntroducesHiddenGrottoes1
+	coord_event 11, 24, SCENE_ROUTE32_LYRA_GROTTOES, Route32LyraIntroducesHiddenGrottoes2
+	coord_event 12, 24, SCENE_ROUTE32_LYRA_GROTTOES, Route32LyraIntroducesHiddenGrottoes3
+	coord_event 13, 24, SCENE_ROUTE32_LYRA_GROTTOES, Route32LyraIntroducesHiddenGrottoes4
+	coord_event  7, 71, SCENE_ROUTE32_OFFER_SLOWPOKETAIL, Route32WannaBuyASlowpokeTailScript
 
 	def_bg_events
 	bg_event 13,  5, BGEVENT_JUMPTEXT, Route32SignText
@@ -52,7 +56,7 @@ Route32_MapScriptHeader:
 	itemball_event  6, 32, REPEL, 1, EVENT_ROUTE_32_REPEL
 	cuttree_event 10, 19, EVENT_ROUTE_32_CUT_TREE
 	cuttree_event -1, 29, EVENT_MAGNET_TUNNEL_EAST_CUT_TREE
-	cuttree_event 19, 32, EVENT_CHERRYGROVE_BAY_CUT_TREE
+	cuttree_event 19, 32, EVENT_CHERRYGROVE_BAY_CUT_TREE_1
 
 	object_const_def
 	const ROUTE32_COOLTRAINER_M
@@ -118,8 +122,7 @@ Route32CooltrainerMTrigger:
 	opentext
 	writetext .AfterText1
 	promptbutton
-	verbosegiveitem MIRACLE_SEED
-	iffalse_endtext
+	verbosegiveitem MIRACLE_SEED, iffalse_endtext
 	setevent EVENT_GOT_MIRACLE_SEED_FROM_ROUTE_32_LEADER
 .GotMiracleSeed:
 	jumpthisopenedtext
@@ -279,9 +282,14 @@ Route32LyraIntroducesHiddenGrottoesMainScript:
 	opentext
 	writetext .GreetingText
 	promptbutton
+	checkevent EVENT_TOGEPI_HATCHED
+	iftruefwd .HatchedEgg
 	checkegg
 	iftruefwd .HaveEgg
 	writetext .NoEggText
+	sjumpfwd .Continue
+.HatchedEgg
+	writetext .HatchedEggText
 	sjumpfwd .Continue
 .HaveEgg
 	writetext .HaveEggText
@@ -299,30 +307,44 @@ Route32LyraIntroducesHiddenGrottoesMainScript:
 .GreetingText:
 	text "<PLAYER>!"
 	line "Hi there!"
+
+	para "Prof.Elm said his"
+	line "aide was deliver-"
+	cont "ing an Egg to you."
 	done
 
 .NoEggText:
-	text "Prof.Elm said his"
-	line "aide was deliver-"
-	cont "ing an Egg to you."
-
-	para "Be sure to carry"
-	line "it. I'm curious"
-
-	para "what #mon it"
-	line "could be!"
-	done
-
-.HaveEggText:
-	text "Oh good! You're"
-	line "carrying that Egg"
-
-	para "just like Prof."
-	line "Elm asked."
+	text "Be sure to carry"
+	line "it with you."
 
 	para "I'm so curious"
 	line "what #mon it"
 	cont "could be!"
+	done
+
+.HaveEggText:
+	text "Oh good! You're"
+	line "carrying it just"
+	cont "like he wanted."
+
+	para "I'm so curious"
+	line "what #mon it"
+	cont "could be!"
+	done
+
+.HatchedEggText:
+	text "…What? You already"
+	line "hatched it?"
+
+	para "Oh my gosh! So it"
+	line "was a Togepi!"
+	cont "They're so rare!"
+
+	para "You should show"
+	line "it to Prof.Elm"
+
+	para "while you're not"
+	line "too far from home!"
 	done
 
 .QuestionText:
@@ -361,7 +383,7 @@ Route32LyraIntroducesHiddenGrottoesOutroScript:
 	turnobject PLAYER, DOWN
 	applymovement ROUTE32_LYRA, .LeaveMovement2
 	disappear ROUTE32_LYRA
-	setscene $2
+	setscene SCENE_ROUTE32_OFFER_SLOWPOKETAIL
 	playmusic MUSIC_ROUTE_30
 	end
 
@@ -417,15 +439,24 @@ Route32WannaBuyASlowpokeTailScript:
 SlowpokeTailSalesmanScript:
 	faceplayer
 _OfferToSellSlowpokeTail:
-	setscene $3
+	setscene SCENE_ROUTE32_NOOP
 	opentext
 	writetext Text_MillionDollarSlowpokeTail
 	yesorno
 	iffalsefwd .refused
-	jumpopenedtext Text_ThoughtKidsWereLoaded
+	jumpthisopenedtext
+
+	text "Tch! I thought"
+	line "kids these days"
+	cont "were loaded…"
+	done
 
 .refused
-	jumpopenedtext Text_RefusedToBuySlowpokeTail
+	jumpthisopenedtext
+
+	text "You don't want it?"
+	line "Then scram. Shoo!"
+	done
 
 Route32RoarTMGuyScript:
 	faceplayer
@@ -548,7 +579,17 @@ TrainerFisherRalph1:
 	end
 
 .Swarm:
-	jumpopenedtext FisherRalphSwarmText
+	jumpthisopenedtext
+
+	text "One, two, three…"
+	line "Muahahaha, what a"
+
+	para "great haul!"
+	line "I'm done! Go ahead"
+
+	para "and catch as many"
+	line "as you can, kid!"
+	done
 
 .NumberAccepted:
 	jumpstd numberacceptedm
@@ -708,13 +749,32 @@ FriedaScript:
 .MetFrieda:
 	writetext FriedaGivesGiftText
 	promptbutton
-	verbosegiveitem POISON_BARB
-	iffalse_endtext
+	verbosegiveitem POISON_BARB, iffalse_endtext
 	setevent EVENT_GOT_POISON_BARB_FROM_FRIEDA
-	jumpopenedtext FriedaGaveGiftText
+	jumpthisopenedtext
+
+	text "Frieda: Give it to"
+	line "a #mon that has"
+	cont "Poison-type moves."
+
+	para "Oh!"
+
+	para "It's wicked!"
+
+	para "You'll be shocked"
+	line "how good it makes"
+	cont "Poison moves!"
+	done
 
 .NotFriday:
-	jumptextfaceplayer FriedaNotFridayText
+	jumpthistextfaceplayer
+
+	text "Frieda: Isn't it"
+	line "Friday today?"
+
+	para "It's so boring"
+	line "when it's not!"
+	done
 
 Movement_Route32CooltrainerMPushesYouBackToViolet:
 	step_up
@@ -771,16 +831,7 @@ Text_MillionDollarSlowpokeTail:
 	para "You'll want this!"
 	done
 
-Text_ThoughtKidsWereLoaded:
-	text "Tch! I thought"
-	line "kids these days"
-	cont "were loaded…"
-	done
 
-Text_RefusedToBuySlowpokeTail:
-	text "You don't want it?"
-	line "Then scram. Shoo!"
-	done
 
 FisherJustinSeenText:
 	text "Whoa!"
@@ -815,16 +866,6 @@ FisherRalphAfterText:
 	line "long friends!"
 	done
 
-FisherRalphSwarmText:
-	text "One, two, three…"
-	line "Muahahaha, what a"
-
-	para "great haul!"
-	line "I'm done! Go ahead"
-
-	para "and catch as many"
-	line "as you can, kid!"
-	done
 
 FisherHenrySeenText:
 	text "My #mon?"
@@ -938,19 +979,6 @@ FriedaGivesGiftText:
 	line "Barb for you!"
 	done
 
-FriedaGaveGiftText:
-	text "Frieda: Give it to"
-	line "a #mon that has"
-	cont "Poison-type moves."
-
-	para "Oh!"
-
-	para "It's wicked!"
-
-	para "You'll be shocked"
-	line "how good it makes"
-	cont "Poison moves!"
-	done
 
 FriedaFridayText:
 	text "Frieda: Hiya! What"
@@ -963,13 +991,6 @@ FriedaFridayText:
 	line "it's great too?"
 	done
 
-FriedaNotFridayText:
-	text "Frieda: Isn't it"
-	line "Friday today?"
-
-	para "It's so boring"
-	line "when it's not!"
-	done
 
 Route32SignText:
 	text "Route 32"

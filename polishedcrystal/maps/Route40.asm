@@ -14,7 +14,7 @@ Route40_MapScriptHeader:
 	bg_event  7,  8, BGEVENT_ITEM + HYPER_POTION, EVENT_ROUTE_40_HIDDEN_HYPER_POTION
 
 	def_object_events
-	object_event  8, 10, SPRITE_BEAUTY, SPRITEMOVEDATA_SPINRANDOM_SLOW, 0, 0, -1, 0, OBJECTTYPE_SCRIPT, 0, MonicaScript, EVENT_ROUTE_40_MONICA_OF_MONDAY
+	object_event  7, 11, SPRITE_BEAUTY, SPRITEMOVEDATA_SPINRANDOM_SLOW, 0, 0, -1, 0, OBJECTTYPE_SCRIPT, 0, MonicaScript, EVENT_ROUTE_40_MONICA_OF_MONDAY
 	object_event 13, 16, SPRITE_SWIMMER_GUY, SPRITEMOVEDATA_STANDING_RIGHT, 0, 0, -1, 0, OBJECTTYPE_GENERICTRAINER, 4, GenericTrainerSwimmermSimon, -1
 	object_event 18, 33, SPRITE_SWIMMER_GUY, SPRITEMOVEDATA_STANDING_LEFT, 0, 0, -1, 0, OBJECTTYPE_GENERICTRAINER, 5, GenericTrainerSwimmermRandall, -1
 	object_event  3, 19, SPRITE_SWIMMER_GIRL, SPRITEMOVEDATA_STANDING_RIGHT, 0, 0, -1, 0, OBJECTTYPE_GENERICTRAINER, 4, GenericTrainerSwimmerfElaine, -1
@@ -24,7 +24,7 @@ Route40_MapScriptHeader:
 	object_event 13,  4, SPRITE_PICNICKER, SPRITEMOVEDATA_SPINRANDOM_SLOW, 0, 0, -1, PAL_NPC_BLUE, OBJECTTYPE_COMMAND, jumptextfaceplayer, Route40PicnickerText, -1
 	object_event 14,  8, SPRITE_BEACH_GUY, SPRITEMOVEDATA_SPINRANDOM_SLOW, 0, 0, -1, 0, OBJECTTYPE_SCRIPT, 0, Route40BeachGuyScript, -1
 	object_event 16, 27, SPRITE_FISHER, SPRITEMOVEDATA_STANDING_LEFT, 0, 0, -1, 0, OBJECTTYPE_SCRIPT, 0, Route40FisherScript, -1
-	smashrock_event  7, 11
+	smashrock_event  8, 10
 	smashrock_event  6, 9
 	smashrock_event  7, 8
 
@@ -76,12 +76,29 @@ GenericTrainerSwimmermRandall:
 Route40PokefanMScript:
 	checkevent EVENT_BATTLE_TOWER_OPEN
 	iftrue_jumptextfaceplayer Route40PokefanMText2
-	jumptextfaceplayer Route40PokefanMText
+	jumpthistextfaceplayer
+
+	text "Hm! There's a big"
+	line "building up ahead!"
+
+	para "What is it?"
+	done
 
 Route40BeachGuyScript:
 	checkevent EVENT_BATTLE_TOWER_OPEN
 	iftrue_jumptextfaceplayer Route40BeachGuyText2
-	jumptextfaceplayer Route40BeachGuyText
+	jumpthistextfaceplayer
+
+	text "The Battle Tower"
+	line "is almost ready!"
+
+	para "Trainers are head-"
+	line "ing to Olivine"
+
+	para "from all over the"
+	line "world to test"
+	cont "their strength."
+	done
 
 Route40FisherScript:
 	faceplayer
@@ -171,13 +188,28 @@ MonicaScript:
 .MetMonica:
 	writetext MonicaGivesGiftText
 	promptbutton
-	verbosegiveitem SHARP_BEAK
-	iffalsefwd MonicaDoneScript
+	verbosegiveitem SHARP_BEAK, iffalsefwd MonicaDoneScript
 	setevent EVENT_GOT_SHARP_BEAK_FROM_MONICA
-	jumpopenedtext MonicaGaveGiftText
+	jumpthisopenedtext
+
+	text "Monica: It's an"
+	line "item that raises"
+
+	para "the power of Fly-"
+	line "ing-type moves."
+
+	para "You should equip a"
+	line "bird #mon with"
+	cont "that item."
+	done
 
 MonicaNotMondayScript:
-	jumptextfaceplayer MonicaNotMondayText
+	jumpthistextfaceplayer
+
+	text "Monica: I don't"
+	line "think today is"
+	cont "Monday. How sad…"
+	done
 
 MonicaDoneScript:
 	end
@@ -239,12 +271,6 @@ Route40BeachGirlText:
 	line "before swimming."
 	done
 
-Route40PokefanMText:
-	text "Hm! There's a big"
-	line "building up ahead!"
-
-	para "What is it?"
-	done
 
 Route40PokefanMText2:
 	text "Hm! Look at all"
@@ -267,17 +293,6 @@ Route40PicnickerText:
 	cont "from a big city."
 	done
 
-Route40BeachGuyText:
-	text "The Battle Tower"
-	line "is almost ready!"
-
-	para "Trainers are head-"
-	line "ing to Olivine"
-
-	para "from all over the"
-	line "world to test"
-	cont "their strength."
-	done
 
 Route40BeachGuyText2:
 	text "Have you gone to"
@@ -309,17 +324,6 @@ MonicaGivesGiftText:
 	cont "a gift for you!"
 	done
 
-MonicaGaveGiftText:
-	text "Monica: It's an"
-	line "item that raises"
-
-	para "the power of Fly-"
-	line "ing-type moves."
-
-	para "You should equip a"
-	line "bird #mon with"
-	cont "that item."
-	done
 
 MonicaMondayText:
 	text "Monica: My broth-"
@@ -332,11 +336,6 @@ MonicaMondayText:
 	line "find them all!"
 	done
 
-MonicaNotMondayText:
-	text "Monica: I don't"
-	line "think today is"
-	cont "Monday. How sad…"
-	done
 
 Route40SignText:
 	text "Route 40"

@@ -26,15 +26,18 @@ DEF NUM_SIGNS EQU const_value
 
 ; map environments (wEnvironment)
 ; EnvironmentColorsPointers indexes (see data/maps/environment_colors.asm)
-	const_def 1
+	const_def
 	const TOWN
 	const ROUTE
+DEF LAST_OUTDOOR_ENV EQU const_value - 1
+	const ISOLATED ; neither outdoor nor indoor
+DEF FIRST_INDOOR_ENV EQU const_value
 	const INDOOR
-	const CAVE
-	const ISOLATED
 	const GATE
+DEF FIRST_DIGGABLE_ENV EQU const_value
+	const CAVE
 	const DUNGEON
-DEF NUM_ENVIRONMENTS EQU const_value - 1
+DEF NUM_ENVIRONMENTS EQU const_value
 
 ; map palettes (wEnvironment)
 	const_def
@@ -43,6 +46,7 @@ DEF NUM_ENVIRONMENTS EQU const_value - 1
 	const PALETTE_NITE
 	const PALETTE_MORN
 	const PALETTE_EVE
+	const PALETTE_INDOOR
 DEF NUM_MAP_PALETTES EQU const_value
 
 DEF IN_DARKNESS EQU %1000
@@ -65,6 +69,7 @@ DEF DARKNESS_PALSET EQU %00011011 ; brightlevel 0, 1, 2, 3
 	const FISHGROUP_QWILFISH
 	const FISHGROUP_REMORAID
 	const FISHGROUP_HISUIAN_QWILFISH
+	const FISHGROUP_STARYU
 DEF NUM_FISHGROUPS EQU const_value
 
 ; wMapConnections
@@ -81,6 +86,8 @@ DEF NUM_FISHGROUPS EQU const_value
 	const AZALEA_OVERCAST
 	const LAKE_OF_RAGE_OVERCAST
 	const STORMY_BEACH_OVERCAST
+	const ROUTE_10_OVERCAST
+	const GENERIC_OVERCAST
 
 ; SpawnPoints indexes (see data/maps/spawn_points.asm)
 	const_def
@@ -100,6 +107,7 @@ DEF NUM_FISHGROUPS EQU const_value
 	const SPAWN_FUCHSIA
 	const SPAWN_CINNABAR
 	const SPAWN_INDIGO
+	const SPAWN_POKEMON_LEAGUE
 ; johto
 	const SPAWN_NEW_BARK
 	const SPAWN_CHERRYGROVE
@@ -158,6 +166,7 @@ DEF SPAWN_N_A EQU -1
 	const FLY_FUCHSIA
 	const FLY_CINNABAR
 	const FLY_INDIGO
+	const FLY_POKEMON_LEAGUE
 ; orange
 	const FLY_SHAMOUTI
 	const FLY_VALENCIA

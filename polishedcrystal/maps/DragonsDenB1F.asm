@@ -1,5 +1,7 @@
 DragonsDenB1F_MapScriptHeader:
 	def_scene_scripts
+	scene_const SCENE_DRAGONSDENB1F_NOOP
+	scene_const SCENE_DRAGONSDENB1F_CLAIR_GIVES_TM
 
 	def_callbacks
 	callback MAPCALLBACK_NEWMAP, DragonsDenB1FRivalCallback
@@ -7,9 +9,11 @@ DragonsDenB1F_MapScriptHeader:
 	def_warp_events
 	warp_event 20,  3, DRAGONS_DEN_1F, 3
 	warp_event 19, 29, DRAGON_SHRINE, 1
+	warp_event 19, 26, DRAGON_SHRINE, 3
+	warp_event 20, 26, DRAGON_SHRINE, 4
 
 	def_coord_events
-	coord_event 19, 30, 1, DragonsDenB1FClairTrigger
+	coord_event 19, 30, SCENE_DRAGONSDENB1F_CLAIR_GIVES_TM, DragonsDenB1FClairTrigger
 
 	def_bg_events
 	bg_event 18, 24, BGEVENT_JUMPTEXT, DragonsDenShrineSignText
@@ -20,7 +24,6 @@ DragonsDenB1F_MapScriptHeader:
 	def_object_events
 	object_event 14, 30, SPRITE_CLAIR, SPRITEMOVEDATA_STANDING_UP, 0, 0, -1, 0, OBJECTTYPE_SCRIPT, 0, ObjectEvent, EVENT_DRAGONS_DEN_CLAIR
 	object_event 20, 23, SPRITE_RIVAL, SPRITEMOVEDATA_WANDER, 2, 2, -1, 0, OBJECTTYPE_SCRIPT, 0, DragonsDenB1FRivalScript, EVENT_RIVAL_DRAGONS_DEN
-	object_event 34, 19, SPRITE_KIMONO_GIRL, SPRITEMOVEDATA_SPINRANDOM_FAST, 0, 0, -1, PAL_NPC_PINK, OBJECTTYPE_SCRIPT, 0, KimonoGirlMinaScript, -1
 	object_event 20,  8, SPRITE_DRAGON_TAMER, SPRITEMOVEDATA_STANDING_UP, 0, 0, -1, 0, OBJECTTYPE_GENERICTRAINER, 4, GenericTrainerDragonTamerDarin, -1
 	object_event  8,  8, SPRITE_DRAGON_TAMER, SPRITEMOVEDATA_STANDING_DOWN, 0, 0, -1, 0, OBJECTTYPE_GENERICTRAINER, 3, GenericTrainerDragonTamerAdam, -1
 	object_event  4, 17, SPRITE_ACE_TRAINER_M, SPRITEMOVEDATA_STANDING_RIGHT, 0, 0, -1, 0, OBJECTTYPE_GENERICTRAINER, 1, GenericTrainerAceDuoDanandcara1, -1
@@ -30,11 +33,12 @@ DragonsDenB1F_MapScriptHeader:
 	itemball_event 35, 16, DRAGON_FANG, 1, EVENT_DRAGONS_DEN_B1F_DRAGON_FANG
 	itemball_event 30,  4, CALCIUM, 1, EVENT_DRAGONS_DEN_B1F_CALCIUM
 	itemball_event  5, 20, MAX_ELIXIR, 1, EVENT_DRAGONS_DEN_B1F_MAX_ELIXIR
+	object_event 19, 26, SPRITE_PAGODA, SPRITEMOVEDATA_PAGODA_LEFT, 0, 0, -1, 0, OBJECTTYPE_COMMAND, end, NULL, -1
+	object_event 20, 26, SPRITE_PAGODA, SPRITEMOVEDATA_PAGODA_RIGHT, 0, 0, -1, 0, OBJECTTYPE_COMMAND, end, NULL, -1
 
 	object_const_def
 	const DRAGONSDENB1F_CLAIR
 	const DRAGONSDENB1F_RIVAL
-	const DRAGONSDENB1F_KIMONO_GIRL
 
 DragonsDenB1FRivalCallback:
 	checkevent EVENT_BEAT_RIVAL_IN_MT_MOON
@@ -81,8 +85,8 @@ DragonsDenB1FClairTrigger:
 	pause 30
 	special RestartMapMusic
 	disappear DRAGONSDENB1F_CLAIR
-	setscene $0
-	setmapscene NEW_BARK_TOWN, $1
+	setscene SCENE_DRAGONSDENB1F_NOOP
+	setmapscene NEW_BARK_TOWN, SCENE_NEWBARKTOWN_LYRA_FINAL
 	clearevent EVENT_LYRA_IN_HER_ROOM
 	end
 
@@ -163,7 +167,7 @@ DragonsDenB1FRivalScript:
 	closetext
 	setevent EVENT_GOT_RIVALS_EGG
 	setevent EVENT_TEMPORARY_UNTIL_MAP_RELOAD_1
-	setmapscene ELMS_LAB, $7
+	setmapscene ELMS_LAB, SCENE_ELMSLAB_AIDE_GIVES_POKE_BALLS
 	special RestartMapMusic
 	end
 
@@ -375,89 +379,4 @@ GenericTrainerTwinsLeaandpia2:
 
 .BeatenText:
 	text "Meanie."
-	done
-
-KimonoGirlMinaScript:
-	checkevent EVENT_GOT_ABILITYPATCH_FROM_KIMONO_GIRL_MINA
-	iftrue_jumptextfaceplayer .OutroText
-	faceplayer
-	checkevent EVENT_BEAT_KIMONO_GIRL_MINA
-	iftruefwd .Beaten
-	checkevent EVENT_BEAT_KIMONO_GIRL_NAOKO
-	iffalse_jumptext .IntroText
-	checkevent EVENT_BEAT_KIMONO_GIRL_SAYO
-	iffalse_jumptext .IntroText
-	checkevent EVENT_BEAT_KIMONO_GIRL_ZUKI
-	iffalse_jumptext .IntroText
-	checkevent EVENT_BEAT_KIMONO_GIRL_KUNI
-	iffalse_jumptext .IntroText
-	checkevent EVENT_BEAT_KIMONO_GIRL_MIKI
-	iffalse_jumptext .IntroText
-	showtext .SeenText
-	winlosstext .BeatenText, 0
-	setlasttalked DRAGONSDENB1F_KIMONO_GIRL
-	loadtrainerwithpal KIMONO_GIRL, MINA, TRAINERPAL_MINA
-	startbattle
-	reloadmapafterbattle
-	setevent EVENT_BEAT_KIMONO_GIRL_MINA
-.Beaten:
-	opentext
-	writetext .AfterText
-	promptbutton
-	verbosegiveitem ABILITYPATCH
-	iffalse_jumpopenedtext .BagFullText
-	setevent EVENT_GOT_ABILITYPATCH_FROM_KIMONO_GIRL_MINA
-	jumpthisopenedtext
-
-.OutroText:
-	text "Coming here from"
-	line "Ecruteak City"
-
-	para "was worth the"
-	line "trouble."
-
-	para "Dragon's Den is an"
-	line "ideal place for me"
-	cont "to train."
-	done
-
-.BagFullText:
-	text "…That is, once you"
-	line "have freed up some"
-	cont "space in your Bag."
-	done
-
-.IntroText:
-	text "I am a Kimono"
-	line "Girl."
-
-	para "Haven't you met my"
-	line "five dancing cou-"
-	cont "sins in Ecruteak?"
-
-	para "Let me know if"
-	line "you do."
-	done
-
-.SeenText:
-	text "She who knows the"
-	line "most speaks the"
-	cont "least!"
-
-	para "Allow me to cha-"
-	line "llenge you and"
-	cont "your #mon!"
-	done
-
-.BeatenText:
-	text "Oh, you are"
-	line "wonderful…"
-	done
-
-.AfterText:
-	text "You are quite the"
-	line "Trainer."
-
-	para "You are worthy of"
-	line "this item!"
 	done

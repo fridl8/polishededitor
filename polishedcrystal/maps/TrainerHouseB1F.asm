@@ -1,5 +1,6 @@
 TrainerHouseB1F_MapScriptHeader:
 	def_scene_scripts
+	scene_const SCENE_TRAINERHOUSEB1F_ASK_BATTLE
 
 	def_callbacks
 	callback MAPCALLBACK_OBJECTS, TrainerHouseB1FCallback
@@ -8,7 +9,7 @@ TrainerHouseB1F_MapScriptHeader:
 	warp_event  9,  4, TRAINER_HOUSE_1F, 3
 
 	def_coord_events
-	coord_event  7,  3, 0, TrainerHouseReceptionistScript
+	coord_event  7,  3, SCENE_TRAINERHOUSEB1F_ASK_BATTLE, TrainerHouseReceptionistScript
 
 	def_bg_events
 
@@ -30,14 +31,8 @@ TrainerHouseB1FCallback:
 	and a
 	jr nz, .got_opponent
 .pick_opponent
-	ld a, NUM_TRAINER_HOUSE_OPPONENTS
-	call RandomRange
-	inc a
-	ld [wDailyTrainerHouseOpponent], a
+	farcall PickDailyTrainerHouseOpponent
 .got_opponent
-	call .IsOpponentValid
-	and a
-	jr z, .pick_opponent
 	call GetDailyTrainerHouseOpponent
 	ld a, [hl]
 	farjp LoadTrainerSpriteAsMapObject1
@@ -122,6 +117,8 @@ TrainerHouseReceptionistScript:
 	ld [wOtherTrainerClass], a
 	ld a, [hl]
 	ld [wOtherTrainerID], a
+	xor a ; TRAINERPAL_NONE
+	ld [wTrainerPal], a
 	ret
 
 Movement_EnterTrainerHouseBattleRoom:

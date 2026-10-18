@@ -22,7 +22,7 @@ ProfOaksAide1Script:
 	faceplayer
 	opentext
 	checkevent EVENT_GOT_EXP_SHARE_FROM_PROF_OAKS_AIDE
-	iftruefwd .Explain
+	iftruefwd .GotExpShare
 	writetext ProfOaksAide1HiText
 	waitbutton
 	setval16 15
@@ -34,14 +34,58 @@ ProfOaksAide1Script:
 .HereYouGo
 	writetext ProfOaksAide1HereYouGoText
 	waitbutton
-	verbosegiveitem EXP_SHARE
-	iffalsefwd .NoRoom
+	verbosegiveitem EXP_SHARE, iffalsefwd .NoRoom
 	setevent EVENT_GOT_EXP_SHARE_FROM_PROF_OAKS_AIDE
-.Explain
-	jumpopenedtext ProfOaksAide1ExplainText
+	writetext ProfOaksAide1ExpShareText
+	waitbutton
+	checkkeyitem DEXNAV
+	iftruefwd .AlreadyHaveDexNav
+	writetext ProfOaksAide1OneMoreThingText
+	waitbutton
+	sjumpfwd .GiveDexNav
+
+.GotExpShare
+	; Saves from before the DexNav existed get it on their next visit.
+	checkevent EVENT_GOT_DEXNAV_FROM_PROF_OAKS_AIDE
+	iftruefwd .ExplainDexNav
+	; New Game+ keeps the DexNav (it's in the charm range).
+	checkkeyitem DEXNAV
+	iftruefwd .AlreadyHaveDexNav
+	writetext ProfOaksAide1AlsoHaveThisText
+	waitbutton
+.GiveDexNav
+	verbosegivekeyitem DEXNAV
+.AlreadyHaveDexNav
+	; Clear leftover bits from older saves (D7) before the chain can start.
+	callasm DexNav_ClearSavedData
+	setevent EVENT_GOT_DEXNAV_FROM_PROF_OAKS_AIDE
+.ExplainDexNav
+	jumpthisopenedtext
+
+	text "The DexNav finds"
+	line "wild #mon that"
+	cont "live nearby."
+
+	para "Pick one you've"
+	line "seen, then sneak"
+	cont "up on it!"
+
+	para "Use it again right"
+	line "next to it to see"
+	cont "what it's like!"
+
+	para "Register it to"
+	line "Select to use it"
+	cont "on the go."
+	done
 
 .NoRoom
-	jumpopenedtext ProfOaksAide1NoRoomText
+	jumpthisopenedtext
+
+	text "Oh! I see you"
+	line "don't have any"
+	cont "room for this."
+	done
 
 IlexForestAzaleaGateOfficerText:
 	text "Ilex Forest is"
@@ -89,6 +133,29 @@ ProfOaksAide1UhOhText:
 	cont "15 kinds."
 	done
 
+ProfOaksAide1ExpShareText:
+	text "That Exp.Share"
+	line "helps a #mon"
+
+	para "gain experience"
+	line "without even"
+	cont "battling."
+
+	para "Use it to com-"
+	line "plete the #dex!"
+	done
+
+ProfOaksAide1OneMoreThingText:
+	text "Oh, and one more"
+	line "thing!"
+	done
+
+ProfOaksAide1AlsoHaveThisText:
+	text "Oh, <PLAYER>!"
+	line "Prof.Oak wants you"
+	cont "to have this, too."
+	done
+
 ProfOaksAide1HereYouGoText:
 	text "Let's see…"
 	line "Great job! You've"
@@ -100,22 +167,4 @@ ProfOaksAide1HereYouGoText:
 
 	para "Congratulations!"
 	line "Here you go!"
-	done
-
-ProfOaksAide1NoRoomText:
-	text "Oh! I see you"
-	line "don't have any"
-	cont "room for this."
-	done
-
-ProfOaksAide1ExplainText:
-	text "That Exp.Share"
-	line "helps a #mon"
-
-	para "gain experience"
-	line "without even"
-	cont "battling."
-
-	para "Use it to com-"
-	line "plete the #dex!"
 	done

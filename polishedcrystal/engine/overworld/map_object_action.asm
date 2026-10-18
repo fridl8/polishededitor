@@ -18,12 +18,10 @@ ObjectActionPairPointers:
 	dw SetFacingBoulderDust,           SetFacingStanding          ; OBJECT_ACTION_BOULDER_DUST
 	dw SetFacingGrassShake,            SetFacingStanding          ; OBJECT_ACTION_GRASS_SHAKE
 	dw SetFacingPuddleSplash,          SetFacingStanding          ; OBJECT_ACTION_PUDDLE_SPLASH
-	dw SetFacingCutTree,               SetFacingCutTree           ; OBJECT_ACTION_CUT_TREE
 	dw SetFacingSkyfall,               SetFacingCurrent           ; OBJECT_ACTION_SKYFALL
 	dw SetFacingFruit,                 SetFacingFruit             ; OBJECT_ACTION_FRUIT
 	dw SetFacingBigGyarados,           SetFacingFreezeBigGyarados ; OBJECT_ACTION_BIG_GYARADOS
 	dw SetFacingStandFlip,             SetFacingStandFlip         ; OBJECT_ACTION_STAND_FLIP
-	dw SetFacingPokecomNews,           SetFacingPokecomNews       ; OBJECT_ACTION_POKECOM_NEWS
 	dw SetFacingMuseumDrill,           SetFacingMuseumDrill       ; OBJECT_ACTION_MUSEUM_DRILL
 	dw SetFacingRun,                   SetFacingCurrent           ; OBJECT_ACTION_RUN
 	dw SetFacingSailboatTop,           SetFacingSailboatTop       ; OBJECT_ACTION_SAILBOAT_TOP
@@ -31,7 +29,8 @@ ObjectActionPairPointers:
 	dw SetFacingAlolanExeggutor,       SetFacingAlolanExeggutor   ; OBJECT_ACTION_ALOLAN_EXEGGUTOR
 	dw SetFacingShakeExeggutor,        SetFacingAlolanExeggutor   ; OBJECT_ACTION_SHAKE_EXEGGUTOR
 	dw SetFacingTinyWindows,           SetFacingTinyWindows       ; OBJECT_ACTION_TINY_WINDOWS
-	dw SetFacingMicrophone,            SetFacingMicrophone        ; OBJECT_ACTION_MICROPHONE
+	dw SetFacingBigHoOh,               SetFacingFreezeBigHoOh     ; OBJECT_ACTION_BIG_HO_OH
+	dw SetFacingBigLugia,              SetFacingFreezeBigLugia    ; OBJECT_ACTION_BIG_LUGIA
 	assert_table_length NUM_OBJECT_ACTIONS
 
 SetFacingStanding:
@@ -50,14 +49,6 @@ SetFacingEmote:
 	ld a, FACING_EMOTE
 	jr SetFixedFacing
 
-SetFacingCutTree:
-	ld a, FACING_CUT_TREE
-	jr SetFixedFacing
-
-SetFacingPokecomNews:
-	ld a, FACING_POKECOM_NEWS
-	jr SetFixedFacing
-
 SetFacingSailboatTop:
 	ld a, FACING_SAILBOAT_TOP
 	jr SetFixedFacing
@@ -68,10 +59,6 @@ SetFacingSailboatBottom:
 
 SetFacingAlolanExeggutor:
 	ld a, FACING_ALOLAN_EXEGGUTOR_0
-	jr SetFixedFacing
-
-SetFacingMicrophone:
-	ld a, FACING_MICROPHONE
 	jr SetFixedFacing
 
 SetFacingBigDoll:
@@ -146,7 +133,7 @@ SetFacingSkyfall:
 	ld hl, OBJECT_FLAGS1
 	add hl, bc
 	bit SLIDING_F, [hl]
-	jmp nz, SetFacingCurrent
+	jr nz, SetFacingCurrent
 
 	ld hl, OBJECT_STEP_FRAME
 	add hl, bc
@@ -212,7 +199,7 @@ CounterclockwiseSpinAction:
 .Directions
 	db OW_DOWN, OW_RIGHT, OW_UP, OW_LEFT
 
-SetFacingBounce:
+AlternateStepFrame:
 	ld hl, OBJECT_STEP_FRAME
 	add hl, bc
 	ld a, [hl]
@@ -220,6 +207,10 @@ SetFacingBounce:
 	and %00011111
 	ld [hl], a
 	and %00010000
+	ret
+
+SetFacingBounce:
+	call AlternateStepFrame
 	ld a, FACING_STEP_UP_0
 	jmp nz, SetFixedFacing
 SetFacingFreezeBounce:
@@ -251,17 +242,27 @@ SetFacingFruit:
 	jmp SetFixedFacing
 
 SetFacingBigGyarados:
-	ld hl, OBJECT_STEP_FRAME
-	add hl, bc
-	ld a, [hl]
-	inc a
-	and %00011111
-	ld [hl], a
-	and %00010000
+	call AlternateStepFrame
 	ld a, FACING_BIG_GYARADOS_2
 	jmp nz, SetFixedFacing
 SetFacingFreezeBigGyarados:
 	ld a, FACING_BIG_GYARADOS_1
+	jmp SetFixedFacing
+
+SetFacingBigHoOh:
+	call AlternateStepFrame
+	ld a, FACING_BIG_HO_OH_2
+	jmp nz, SetFixedFacing
+SetFacingFreezeBigHoOh:
+	ld a, FACING_BIG_HO_OH_1
+	jmp SetFixedFacing
+
+SetFacingBigLugia:
+	call AlternateStepFrame
+	ld a, FACING_BIG_LUGIA_2
+	jmp nz, SetFixedFacing
+SetFacingFreezeBigLugia:
+	ld a, FACING_BIG_LUGIA_1
 	jmp SetFixedFacing
 
 SetFacingShakeExeggutor:

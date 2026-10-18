@@ -1,8 +1,9 @@
 TrainerClassNames::
 	list_start
-	li "<PK><MN> Trainer" ; CARRIE
 	li "<PK><MN> Trainer" ; CAL
+	li "<PK><MN> Trainer" ; CARRIE
 	li "<PK><MN> Trainer" ; JACKY
+	li "<PK><MN> Trainer" ; EUNA
 	li "Leader"           ; FALKNER
 	li "Leader"           ; BUGSY
 	li "Leader"           ; WHITNEY
@@ -139,7 +140,7 @@ TrainerClassNames::
 	li "Designer"         ; VALERIE
 	li "<PK><MN> Trainer" ; KUKUI
 	li "Vocalist"         ; PIERS
-	li "Patissier"        ; KATY
+	li "Businessman"      ; LARRY
 	li "Surfer"           ; VICTOR
 	li "#Maniac"          ; BILL_T
 	li "<PK><MN> Trainer" ; YELLOW
@@ -147,4 +148,5 @@ TrainerClassNames::
 	li "Student"          ; IMAKUNI
 	li "Collector"        ; LAWRENCE
 	li "Shrine"           ; REI
+	li "Firebreather"     ; FIREBREATHER_ASHES
 	assert_list_length NUM_TRAINER_CLASSES

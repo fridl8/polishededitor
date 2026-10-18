@@ -66,10 +66,10 @@ GetWildLocations:
 	jr .got_vars
 
 .grass_vars
-	ld a, 6 - (NUM_GRASSMON * 3) ; 6 = first morning species (5=level)
+	ld a, 4 - NUM_GRASSMON * 3 ; 4 = first morning species (3=level)
 	inc e
 .loop
-	add (NUM_GRASSMON * 3)
+	add NUM_GRASSMON * 3
 	dec e
 	jr nz, .loop
 	ld e, a
@@ -261,17 +261,15 @@ _ChooseWildEncounter:
 	xor a ; BATTLETYPE_NORMAL
 	ld [wBattleType], a
 
-	inc hl
-	inc hl
-	inc hl
+	inc hl ; skip map group
+	inc hl ; skip map number
+	inc hl ; skip encounter chance
 	push bc
 	call CheckOnWater
 	pop bc
 	ld de, WaterMonProbTable
 	ld b, NUM_WATERMON
 	jr z, .got_table
-	inc hl
-	inc hl
 	call GetTimeOfDayNotEve
 	push bc
 	ld bc, NUM_GRASSMON * 3
@@ -514,12 +512,22 @@ ApplyAbilityEffectsOnEncounterMon:
 ; Vanilla 3gen+: 50% to force upper bound in a level range
 ; Since we don't have level ranges, 50% to increase level by 1/8 (min 1)
 	call Random
-	rrca
+	add a
 	ret c
 	ld a, c
+	rrca
+	rrca
+	inc a ; round x.5+ up
+	rrca
+	and %11111
+	jr nz, .increased
+	inc a
+.increased
 	cp MAX_LEVEL
-	ret nc
-	inc c
+	jr c, .got_increment
+	ld a, MAX_LEVEL
+.got_increment
+	ld c, a
 	ret
 
 .Intimidate:
@@ -695,6 +703,12 @@ InitRoamMons:
 	ld [wRoamMon1Level], a
 	ld [wRoamMon2Level], a
 
+; form
+	assert HIGH(RAIKOU) == 0 && HIGH(ENTEI) == 0
+	ld a, PLAIN_FORM
+	ld [wRoamMon1Form], a
+	ld [wRoamMon2Form], a
+
 ; raikou starting map
 	ld a, GROUP_ROUTE_42
 	ld [wRoamMon1MapGroup], a
@@ -753,6 +767,11 @@ CheckEncounterRoamMon:
 	ld [wTempWildMonSpecies], a
 	ld a, [hl]
 	ld [wCurPartyLevel], a
+	; Load form from roaming mon data
+	ld bc, wRoamMon1Form - wRoamMon1Level
+	add hl, bc
+	ld a, [hl]
+	ld [wWildMonForm], a
 	ld a, BATTLETYPE_ROAMING
 	ld [wBattleType], a
 
@@ -932,7 +951,7 @@ RandomPhoneRareWildMon:
 
 .GetGrassmon:
 	push hl
-	ld bc, 5 + 4 * 3 ; Location of the level of the 5th wild Pokemon in that map
+	ld bc, 2 + 1 + 4 * 3 ; Location of the level of the 5th wild Pokemon in that map
 	add hl, bc
 	call GetTimeOfDayNotEve
 	ld bc, NUM_GRASSMON * 3
@@ -952,7 +971,7 @@ RandomPhoneRareWildMon:
 	ld b, a
 	ld [wCurForm], a
 	pop hl
-	ld de, 5 + 0 * 3
+	ld de, 2 + 1 + 0 * 3
 	add hl, de
 	inc hl ; Species index of the most common Pokemon on that route
 	ld d, 4
@@ -997,9 +1016,7 @@ RandomPhoneRareWildMon:
 
 .SawRareMonText:
 	; I just saw some rare @  in @ . I'll call you if I see another rare #MON, OK?
-	text_far _JustSawSomeRareMonText
-	text_end
-
+	text_farend _JustSawSomeRareMonText
 RandomPhoneWildMon:
 	farcall GetCallerLocation
 	ld d, b
@@ -1012,7 +1029,7 @@ RandomPhoneWildMon:
 	call LookUpWildmonsForMapDE
 
 .ok
-	ld bc, 5 + 0 * 3
+	ld bc, 2 + 1 + 0 * 3
 	add hl, bc
 	call GetTimeOfDayNotEve
 	ld bc, NUM_GRASSMON * 3
@@ -1069,7 +1086,7 @@ RandomPhoneMon:
 	bit TRNTYPE_NICKNAME, a
 	jr nz, .got_mon
 
-	; TRAINERTYPE_NORMAL uses 3 bytes per mon (Level, Species, Form)
+	; All trainers use at least 3 bytes per mon (Level, Species, Form)
 	ld c, 3
 	; TRAINERTYPE_ITEM uses 1 more byte
 	bit TRNTYPE_ITEM, a

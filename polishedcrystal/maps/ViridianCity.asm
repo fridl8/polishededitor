@@ -5,9 +5,9 @@ ViridianCity_MapScriptHeader:
 	callback MAPCALLBACK_NEWMAP, ViridianCityFlyPoint
 
 	def_warp_events
-	warp_event 32,  7, VIRIDIAN_GYM, 1
+	warp_event 30,  7, VIRIDIAN_GYM, 1
 	warp_event 21,  5, VIRIDIAN_NICKNAME_SPEECH_HOUSE, 1
-	warp_event 23, 15, TRAINER_HOUSE_1F, 1
+	warp_event 21, 15, TRAINER_HOUSE_1F, 1
 	warp_event 29, 19, VIRIDIAN_MART, 2
 	warp_event 23, 25, VIRIDIAN_POKECENTER_1F, 1
 	warp_event 20, 33, ROUTE_1_VIRIDIAN_GATE, 1
@@ -18,15 +18,15 @@ ViridianCity_MapScriptHeader:
 
 	def_bg_events
 	bg_event 17, 17, BGEVENT_JUMPTEXT, ViridianCitySignText
-	bg_event 27,  7, BGEVENT_JUMPTEXT, ViridianGymSignText
+	bg_event 31,  7, BGEVENT_JUMPTEXT, ViridianGymSignText
 	bg_event 19,  1, BGEVENT_JUMPTEXT, ViridianCityTrainerTips1Text
 	bg_event 21, 29, BGEVENT_JUMPTEXT, ViridianCityTrainerTips2Text
-	bg_event 21, 15, BGEVENT_JUMPTEXT, TrainerHouseSignText
+	bg_event 24, 16, BGEVENT_JUMPTEXT, TrainerHouseSignText
 
 	def_object_events
 	object_event 18,  5, SPRITE_GRAMPS, SPRITEMOVEDATA_WANDER, 2, 2, -1, 0, OBJECTTYPE_SCRIPT, 0, ViridianCityCoffeeGramps, -1
-	object_event 32,  8, SPRITE_GRAMPS, SPRITEMOVEDATA_STANDING_DOWN, 0, 0, -1, PAL_NPC_BLUE, OBJECTTYPE_SCRIPT, 0, ViridianCityGrampsNearGym, EVENT_BLUE_IN_CINNABAR
-	object_event 30,  8, SPRITE_GRAMPS, SPRITEMOVEDATA_STANDING_DOWN, 0, 0, -1, PAL_NPC_BLUE, OBJECTTYPE_SCRIPT, 0, ViridianCityGrampsNearGym, EVENT_VIRIDIAN_GYM_BLUE
+	object_event 30,  8, SPRITE_GRAMPS, SPRITEMOVEDATA_STANDING_DOWN, 0, 0, -1, PAL_NPC_BLUE, OBJECTTYPE_SCRIPT, 0, ViridianCityGrampsNearGym, EVENT_BLUE_IN_CINNABAR
+	object_event 33,  8, SPRITE_GRAMPS, SPRITEMOVEDATA_STANDING_DOWN, 0, 0, -1, PAL_NPC_BLUE, OBJECTTYPE_SCRIPT, 0, ViridianCityGrampsNearGym, EVENT_VIRIDIAN_GYM_BLUE
 	object_event  6, 23, SPRITE_FAT_GUY, SPRITEMOVEDATA_STANDING_DOWN, 0, 0, -1, PAL_NPC_RED, OBJECTTYPE_SCRIPT, 0, ViridianCityDreamEaterFisher, -1
 	object_event 17, 21, SPRITE_BUG_CATCHER, SPRITEMOVEDATA_WANDER, 3, 3, -1, 0, OBJECTTYPE_COMMAND, jumptextfaceplayer, ViridianCityYoungsterText, -1
 	object_event 31, 23, SPRITE_SCHOOLBOY, SPRITEMOVEDATA_WANDER, 1, 2, -1, 0, OBJECTTYPE_COMMAND, jumptextfaceplayer, ViridianCityYoungster2Text, -1
@@ -43,12 +43,30 @@ ViridianCityCoffeeGramps:
 	writetext ViridianCityCoffeeGrampsQuestionText
 	yesorno
 	iffalse_jumpopenedtext ViridianCityCoffeeGrampsDoubtedText
-	jumpopenedtext ViridianCityCoffeeGrampsBelievedText
+	jumpthisopenedtext
+
+	text "Good, good. Yes, I"
+	line "was something out"
+
+	para "of the ordinary,"
+	line "let me tell you!"
+	done
 
 ViridianCityGrampsNearGym:
 	checkevent EVENT_BLUE_IN_CINNABAR
 	iftrue_jumptextfaceplayer ViridianCityGrampsNearGymBlueReturnedText
-	jumptextfaceplayer ViridianCityGrampsNearGymText
+	jumpthistextfaceplayer
+
+	text "This Gym didn't"
+	line "have a Leader"
+	cont "until recently."
+
+	para "A young man from"
+	line "Pallet became the"
+
+	para "Leader, but he's"
+	line "often away."
+	done
 
 ViridianCityDreamEaterFisher:
 	faceplayer
@@ -74,11 +92,22 @@ ViridianCityTutorDreamEaterScript:
 	jumpopenedtext Text_ViridianCityTutorRefused
 
 .NoSilverLeaf
-	jumpopenedtext Text_ViridianCityTutorNoSilverLeaf
+	jumpthisopenedtext
+
+	text "You don't have any"
+	line "Silver Leaves…"
+	done
 
 .TeachMove
 	takeitem SILVER_LEAF
-	jumpopenedtext Text_ViridianCityTutorTaught
+	jumpthisopenedtext
+
+	text "Now your #mon"
+	line "knows how to use"
+	cont "Dream Eater…"
+
+	para "…Zzzzz…"
+	done
 
 ViridianCityCoffeeGrampsQuestionText:
 	text "Hey, kid! I just"
@@ -100,13 +129,6 @@ ViridianCityCoffeeGrampsQuestionText:
 	para "Do you believe me?"
 	done
 
-ViridianCityCoffeeGrampsBelievedText:
-	text "Good, good. Yes, I"
-	line "was something out"
-
-	para "of the ordinary,"
-	line "let me tell you!"
-	done
 
 ViridianCityCoffeeGrampsDoubtedText:
 	text "What? You little"
@@ -119,17 +141,6 @@ ViridianCityCoffeeGrampsDoubtedText:
 	line "or two. Humph!"
 	done
 
-ViridianCityGrampsNearGymText:
-	text "This Gym didn't"
-	line "have a Leader"
-	cont "until recently."
-
-	para "A young man from"
-	line "Pallet became the"
-
-	para "Leader, but he's"
-	line "often away."
-	done
 
 ViridianCityGrampsNearGymBlueReturnedText:
 	text "Are you going to"
@@ -169,10 +180,6 @@ Text_ViridianCityTutorDreamEater:
 	cont "exchange."
 	done
 
-Text_ViridianCityTutorNoSilverLeaf:
-	text "You don't have any"
-	line "Silver Leaves…"
-	done
 
 Text_ViridianCityTutorQuestion:
 	text "Should I teach"
@@ -184,13 +191,6 @@ Text_ViridianCityTutorRefused: ; text > text
 	text "OK…"
 	done
 
-Text_ViridianCityTutorTaught:
-	text "Now your #mon"
-	line "knows how to use"
-	cont "Dream Eater…"
-
-	para "…Zzzzz…"
-	done
 
 ViridianCityYoungsterText:
 	text "I heard that there"

@@ -1,5 +1,8 @@
 NewBarkTown_MapScriptHeader:
 	def_scene_scripts
+	scene_const SCENE_NEWBARKTOWN_TEACHER_STOPS_YOU
+	scene_const SCENE_NEWBARKTOWN_LYRA_FINAL
+	scene_const SCENE_NEWBARKTOWN_NOOP
 
 	def_callbacks
 	callback MAPCALLBACK_NEWMAP, NewBarkTownFlyPoint
@@ -12,13 +15,13 @@ NewBarkTown_MapScriptHeader:
 	warp_event 10,  2, ELMS_HOUSE, 2
 
 	def_coord_events
-	coord_event  1,  8, 0, NewBarkTown_TeacherStopsYouTrigger1
-	coord_event  1,  9, 0, NewBarkTown_TeacherStopsYouTrigger2
-	coord_event  6,  4, 0, NewBarkTown_LyraIntroTrigger
-	coord_event 17,  6, 1, NewBarkTown_LyraFinalTrigger1
-	coord_event 17,  7, 1, NewBarkTown_LyraFinalTrigger2
-	coord_event 17,  8, 1, NewBarkTown_LyraFinalTrigger3
-	coord_event 17,  9, 1, NewBarkTown_LyraFinalTrigger4
+	coord_event  1,  8, SCENE_NEWBARKTOWN_TEACHER_STOPS_YOU, NewBarkTown_TeacherStopsYouTrigger1
+	coord_event  1,  9, SCENE_NEWBARKTOWN_TEACHER_STOPS_YOU, NewBarkTown_TeacherStopsYouTrigger2
+	coord_event  6,  4, SCENE_NEWBARKTOWN_TEACHER_STOPS_YOU, NewBarkTown_LyraIntroTrigger
+	coord_event 19,  6, SCENE_NEWBARKTOWN_LYRA_FINAL, NewBarkTown_LyraFinalTrigger1
+	coord_event 19,  7, SCENE_NEWBARKTOWN_LYRA_FINAL, NewBarkTown_LyraFinalTrigger2
+	coord_event 19,  8, SCENE_NEWBARKTOWN_LYRA_FINAL, NewBarkTown_LyraFinalTrigger3
+	coord_event 19,  9, SCENE_NEWBARKTOWN_LYRA_FINAL, NewBarkTown_LyraFinalTrigger4
 
 	def_bg_events
 	bg_event  8,  8, BGEVENT_JUMPTEXT, NewBarkTownSignText
@@ -90,26 +93,26 @@ NewBarkTown_LyraIntroTrigger:
 	applyonemovement NEWBARKTOWN_LYRA, step_up
 	playsound SFX_EXIT_BUILDING
 	disappear NEWBARKTOWN_LYRA
-	setscene $2
+	setscene SCENE_NEWBARKTOWN_NOOP
 	special FadeOutPalettes
 	pause 15
 	warpfacing UP, ELMS_LAB, 4, 11
 	end
 
 NewBarkTown_LyraFinalTrigger1:
-	moveobject NEWBARKTOWN_LYRA, 14, 11
+	moveobject NEWBARKTOWN_LYRA, 16, 11
 	sjumpfwd NewBarkTown_LyraFinalTrigger
 
 NewBarkTown_LyraFinalTrigger2:
-	moveobject NEWBARKTOWN_LYRA, 14, 12
+	moveobject NEWBARKTOWN_LYRA, 16, 12
 	sjumpfwd NewBarkTown_LyraFinalTrigger
 
 NewBarkTown_LyraFinalTrigger3:
-	moveobject NEWBARKTOWN_LYRA, 14, 13
+	moveobject NEWBARKTOWN_LYRA, 16, 13
 	sjumpfwd NewBarkTown_LyraFinalTrigger
 
 NewBarkTown_LyraFinalTrigger4:
-	moveobject NEWBARKTOWN_LYRA, 14, 14
+	moveobject NEWBARKTOWN_LYRA, 16, 14
 NewBarkTown_LyraFinalTrigger:
 	appear NEWBARKTOWN_LYRA
 	applymovement NEWBARKTOWN_LYRA, Movement_LyraSaysGoodbye1_NBT
@@ -144,7 +147,7 @@ NewBarkTown_LyraFinalTrigger:
 	showtext Text_LyraGoodbye2
 	applymovement NEWBARKTOWN_LYRA, Movement_LyraSaysGoodbye3_NBT
 	disappear NEWBARKTOWN_LYRA
-	setscene $2
+	setscene SCENE_NEWBARKTOWN_NOOP
 	playmapmusic
 	end
 
@@ -155,7 +158,12 @@ NewBarkTownTeacherScript:
 	iftrue_jumptextfaceplayer Text_TellMomIfLeaving
 	checkevent EVENT_GOT_A_POKEMON_FROM_ELM
 	iftrue_jumptextfaceplayer Text_YourMonIsAdorable
-	jumptextfaceplayer Text_RefreshingBreeze
+	jumpthistextfaceplayer
+
+	text "There's always"
+	line "such a refreshing"
+	cont "breeze here."
+	done
 
 NewBarkTownRivalScript:
 	showtext NewBarkTownRivalText1
@@ -219,14 +227,16 @@ Movement_LyraSaysGoodbye1_NBT:
 	step_end
 
 Movement_LyraSaysGoodbye2_NBT:
+	step_up
+	step_up
+	step_up
 	step_right
-	step_up
-	step_up
-	step_up
 	step_right
 	step_end
 
 Movement_LyraSaysGoodbye3_NBT:
+	step_left
+	step_left
 	step_left
 	step_down
 	step_down
@@ -243,11 +253,6 @@ Text_GearIsImpressive:
 	line "it for you?"
 	done
 
-Text_RefreshingBreeze:
-	text "There's always"
-	line "such a refreshing"
-	cont "breeze here."
-	done
 
 Text_WaitPlayer:
 	text "Wait, <PLAYER>!"

@@ -3,6 +3,7 @@ INCLUDE "data/sprites/map_objects.asm"
 BlankScreen:
 	call DisableSpriteUpdates
 	xor a
+	assert NO_BG_MAP_TRANSFER == 0
 	ldh [hBGMapMode], a
 	call ClearBGPalettes
 	call ClearSprites
@@ -31,21 +32,15 @@ SpawnPlayer:
 	ld hl, MAPOBJECT_PALETTE
 	add hl, bc
 	ld a, [wPlayerGender]
-	lb de, PAL_NPC_RED, OBJECTTYPE_SCRIPT
-	and a ; PLAYER_MALE
-	jr z, .ok
-	assert PAL_NPC_RED + 1 == PAL_NPC_BLUE
-	inc d
-	dec a ; PLAYER_FEMALE
-	jr z, .ok
-	; PLAYER_ENBY
-	assert PAL_NPC_BLUE + 1 == PAL_NPC_GREEN
-	inc d
-.ok
-	ld [hl], d
+	assert PLAYER_MALE + 1 == PAL_NPC_RED
+	assert PLAYER_FEMALE + 1 == PAL_NPC_BLUE
+	assert PLAYER_ENBY + 1 == PAL_NPC_GREEN
+	assert PLAYER_BETA + 1 == PAL_NPC_PURPLE
+	inc a
+	ld [hl], a
 	ld hl, MAPOBJECT_TYPE
 	add hl, bc
-	ld [hl], e
+	ld [hl], OBJECTTYPE_SCRIPT
 	xor a
 	ldh [hMapObjectIndexBuffer], a
 	ld bc, wMapObjects
@@ -287,7 +282,7 @@ InitializeVisibleSprites:
 	ret
 
 CheckObjectEnteringVisibleRange::
-	ld a, [wPlayerStepDirection]
+	ldh a, [hPlayerStepDirection]
 	cp STANDING
 	ret z
 	call StackJumpTable
@@ -458,6 +453,10 @@ CopyTempObjectToObjectStruct:
 	; the "radius" for Pokémon icons is the species, so don't alter it
 	ld a, [wTempObjectCopySprite]
 	cp SPRITE_MON_ICON
+	ld a, [wTempObjectCopyRadius]
+	jr z, .keep_radius
+	ld a, [wTempObjectCopySprite]
+	cp SPRITE_AQUARIUM_MON
 	ld a, [wTempObjectCopyRadius]
 	jr z, .keep_radius
 	; add 1 to the y and x radii
@@ -845,9 +844,13 @@ GetRelativeFacing::
 	ret
 
 QueueFollowerFirstStep:
+	ld a, [wFollowInSync]
+	and a
+	jr nz, .sync
 	call .QueueFirstStep
 	jr c, .same
 	ld [wFollowMovementQueue], a
+.sync
 	xor a
 	ld [wFollowerMovementQueueLength], a
 	ret

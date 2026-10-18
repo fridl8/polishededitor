@@ -1,10 +1,12 @@
 GoldenrodCity_MapScriptHeader:
 	def_scene_scripts
-	scene_script GoldenrodCityTrigger0
+	scene_script GoldenrodCityStepDownScene, SCENE_GOLDENRODCITY_STEP_DOWN
+	scene_const SCENE_GOLDENRODCITY_NOOP
 
 	def_callbacks
 	callback MAPCALLBACK_NEWMAP, GoldenrodCityFlyPoint
 	callback MAPCALLBACK_OBJECTS, GoldenrodCityMoveTutor
+	callback MAPCALLBACK_CMDQUEUE, GoldenrodCitySetUpPaletteSwap
 
 	def_warp_events
 	warp_event 28,  7, GOLDENROD_GYM, 1
@@ -19,34 +21,37 @@ GoldenrodCity_MapScriptHeader:
 	warp_event 18, 21, GOLDENROD_GAME_CORNER, 1
 	warp_event  9, 15, RADIO_TOWER_1F, 1 ; hole
 	warp_event 23,  1, ROUTE_35_GOLDENROD_GATE, 3
-	warp_event 13,  5, UNDERGROUND_PATH_SWITCH_ROOM_ENTRANCES, 8
-	warp_event 13, 29, UNDERGROUND_PATH_SWITCH_ROOM_ENTRANCES, 5
+	warp_event 13,  5, GOLDENROD_UNDERGROUND_ENTRANCES, 5
+	warp_event 13, 29, GOLDENROD_UNDERGROUND_ENTRANCES, 2
 	warp_event 18, 27, GOLDENROD_POKECOM_CENTER_1F, 2
 	warp_event  4, 16, GOLDENROD_HARBOR_GATE, 3
 	warp_event  4, 17, GOLDENROD_HARBOR_GATE, 4
-	warp_event 30, 15, GOLDENROD_MUSEUM_1F, 2
+	warp_event 30, 15, GOLDENROD_MUSEUM_1F, 1
 	warp_event 37, 19, GOLDENROD_NET_BALL_HOUSE, 1
 	warp_event 33, 23, GOLDENROD_BAND_HOUSE, 1
 	warp_event 13, 21, GOLDENROD_HONEY_HOUSE, 1
-	warp_event 39, 27, UNDERGROUND_PATH_SWITCH_ROOM_ENTRANCES, 11
+	warp_event 39, 27, GOLDENROD_UNDERGROUND_ENTRANCES, 8
+	warp_event 19, 21, GOLDENROD_GAME_CORNER, 2
+	warp_event 29, 27, GOLDENROD_DEPT_STORE_1F, 2
+	warp_event 31, 15, GOLDENROD_MUSEUM_1F, 2
 
 	def_coord_events
-	coord_event  9, 15, 1, GoldenrodCityPanUpScript
+	coord_event  9, 15, SCENE_GOLDENRODCITY_NOOP, GoldenrodCityPanUpScript
 
 	def_bg_events
-	bg_event 14, 14, BGEVENT_JUMPTEXT, GoldenrodCityStationSignText
+	bg_event 15, 14, BGEVENT_JUMPTEXT, GoldenrodCityStationSignText
 	bg_event  7, 15, BGEVENT_JUMPTEXT, GoldenrodCityRadioTowerSignText
 	bg_event 30, 27, BGEVENT_JUMPTEXT, GoldenrodDeptStoreSignText
-	bg_event 30,  9, BGEVENT_JUMPTEXT, GoldenrodGymSignText
+	bg_event 29,  7, BGEVENT_JUMPTEXT, GoldenrodGymSignText
 	bg_event 26, 18, BGEVENT_JUMPTEXT, GoldenrodCitySignText
 	bg_event 32, 30, BGEVENT_JUMPTEXT, GoldenrodCityBikeShopSignText
 	bg_event 20, 22, BGEVENT_JUMPTEXT, GoldenrodCityGameCornerSignText
-	bg_event 16,  7, BGEVENT_JUMPTEXT, GoldenrodCityNameRaterSignText
+	bg_event 17,  7, BGEVENT_JUMPTEXT, GoldenrodCityNameRaterSignText
 	bg_event 12,  6, BGEVENT_JUMPTEXT, GoldenrodCityUndergroundSignText
 	bg_event 14, 30, BGEVENT_JUMPTEXT, GoldenrodCityUndergroundSignText
 	bg_event 40, 28, BGEVENT_JUMPTEXT, GoldenrodCityUndergroundSignText
 	bg_event 20, 27, BGEVENT_JUMPTEXT, PokeComCenterSignText
-	bg_event 34,  6, BGEVENT_JUMPTEXT, GoldenrodCityFlowerShopSignText
+	bg_event 35,  6, BGEVENT_JUMPTEXT, GoldenrodCityFlowerShopSignText
 	bg_event 27, 15, BGEVENT_JUMPTEXT, GoldenrodMuseumSignText
 
 	def_object_events
@@ -87,18 +92,29 @@ GoldenrodCityMoveTutor:
 	disappear GOLDENRODCITY_POKEFAN_M2
 	endcallback
 
-GoldenrodCityTrigger0:
-	sdefer GoldenrodCityStepDownScript
+GoldenrodCitySetUpPaletteSwap:
+	usepaletteswap .PaletteSwap
+	endcallback
+
+.PaletteSwap:
+	paletteswap 22, 39, 7, 19, PAL_BG_WATER, OverworldWaterPalettes, GoldenrodMuseumRoofPalettes
+	; The unswapped NULL case will keep whichever palette was chosen by the previous case
+	paletteswap 26, 41, 21, 33, PAL_BG_WATER, NULL, GoldenrodBikeShopRoofPalettes
+	paletteswap 8, 27, 12, 28, PAL_BG_GREEN, OverworldGreenPalettes, GameCornerExteriorPalettes
+	db -1 ; end
+
+GoldenrodCityStepDownScene:
+	sdefer .Script
 	end
 
-GoldenrodCityStepDownScript:
-	readvar VAR_YCOORD
-	ifnotequal $f, .Done
+.Script:
 	readvar VAR_XCOORD
-	ifnotequal $9, .Done
+	ifnotequal 9, .Done
+	readvar VAR_YCOORD
+	ifnotequal 15, .Done
 	applyonemovement PLAYER, step_down
 .Done
-	setscene $1
+	setscene SCENE_GOLDENRODCITY_NOOP
 	end
 
 GoldenrodCityPanUpScript:
@@ -111,7 +127,7 @@ GoldenrodCityPanUpScript:
 	special Special_FadeOutMusic
 	special FadeOutPalettes
 	pause 15
-	setscene $0
+	setscene SCENE_GOLDENRODCITY_STEP_DOWN
 	warpfacing UP, RADIO_TOWER_1F, 2, 7
 	end
 
@@ -178,29 +194,58 @@ MoveTutor:
 	waitsfx
 	playsound SFX_TRANSACTION
 	special Special_DisplayCoinCaseBalance
-	jumpopenedtext GoldenrodCityMoveTutorFarewellKidText
+	jumpthisopenedtext
+
+	text "Wahahah!"
+	line "Good day, kid!"
+	done
 
 .NotEnoughMoney:
-	jumpopenedtext GoldenrodCityMoveTutorYouDontHaveEnoughCoinsText
+	jumpthisopenedtext
+
+	text "…You don't have"
+	line "enough coins here…"
+	done
 
 GoldenrodCityCooltrainerF1Script:
 	checkevent EVENT_CLEARED_RADIO_TOWER
 	iftrue_jumptextfaceplayer GoldenrodCityCooltrainerF1Text_ClearedRadioTower
-	jumptextfaceplayer GoldenrodCityCooltrainerF1Text
+	jumpthistextfaceplayer
+
+	text "Is that man in"
+	line "black dressed up"
+
+	para "like a Team Rocket"
+	line "member? How silly!"
+	done
 
 GoldenrodCityCooltrainerF2Script:
 	checkflag ENGINE_RADIO_CARD
 	iffalse_jumptextfaceplayer GoldenrodCityCooltrainerF2Text
 	checkevent EVENT_RESTORED_POWER_TO_KANTO
 	iffalse_jumptextfaceplayer GoldenrodCityCooltrainerFOlivineText
-	jumptextfaceplayer GoldenrodCityCooltrainerF2Text_GotRadioCard
+	jumpthistextfaceplayer
+
+	text "I came here on the"
+	line "Magnet Train."
+
+	para "Time to do some"
+	line "shopping!"
+	done
 
 GoldenrodCityYoungster2Script:
 	faceplayer
 	opentext
 	checktime (1 << EVE) | (1 << NITE)
 	iftrue_jumpopenedtext GoldenrodCityYoungster2Text
-	jumpopenedtext GoldenrodCityYoungsterDayText
+	jumpthisopenedtext
+
+	text "Have you been to"
+	line "the Museum?"
+
+	para "It's full of cool"
+	line "exhibits!"
+	done
 
 GoldenrodCityRocketScoutScript:
 	checkevent EVENT_RADIO_TOWER_ROCKET_TAKEOVER
@@ -250,13 +295,6 @@ GoldenrodCityYoungster1Text:
 	line "anywhere."
 	done
 
-GoldenrodCityCooltrainerF1Text:
-	text "Is that man in"
-	line "black dressed up"
-
-	para "like a Team Rocket"
-	line "member? How silly!"
-	done
 
 GoldenrodCityCooltrainerF1Text_ClearedRadioTower:
 	text "Was that man in"
@@ -291,21 +329,7 @@ GoldenrodCityCooltrainerFOlivineText:
 	cont "but more scenic."
 	done
 
-GoldenrodCityCooltrainerF2Text_GotRadioCard:
-	text "I came here on the"
-	line "Magnet Train."
 
-	para "Time to do some"
-	line "shopping!"
-	done
-
-GoldenrodCityYoungsterDayText:
-	text "Have you been to"
-	line "the Museum?"
-
-	para "It's full of cool"
-	line "exhibits!"
-	done
 
 GoldenrodCityYoungster2Text:
 	text "E-he-he-he…"
@@ -522,16 +546,7 @@ GoldenrodCityMoveTutorIfYouUnderstandYouveMadeItText:
 	cont "a trainer."
 	done
 
-GoldenrodCityMoveTutorFarewellKidText:
-	text "Wahahah!"
-	line "Good day, kid!"
-	done
 
 GoldenrodCityMoveTutorBButText:
 	text "B-but…"
-	done
-
-GoldenrodCityMoveTutorYouDontHaveEnoughCoinsText:
-	text "…You don't have"
-	line "enough coins here…"
 	done

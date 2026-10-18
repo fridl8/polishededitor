@@ -26,7 +26,18 @@ GentlemanAlfredScript:
 	endifjustbattled
 	checkevent EVENT_JASMINE_RETURNED_TO_GYM
 	iftrue_jumptextfaceplayer GentlemanAlfredFinalText
-	jumptextfaceplayer GentlemanAlfredAfterBattleText
+	jumpthistextfaceplayer
+
+	text "Up top is a #-"
+	line "mon that keeps the"
+	cont "Lighthouse lit."
+
+	para "But I hear that"
+	line "it's sick now and"
+
+	para "can't be cured by"
+	line "ordinary medicine."
+	done
 
 TrainerSailorHuey1:
 	trainer SAILOR, HUEY1, EVENT_BEAT_SAILOR_HUEY, SailorHuey1SeenText, SailorHuey1BeatenText, 0, SailorHuey1Script
@@ -105,8 +116,7 @@ SailorHuey1Script:
 	checkevent EVENT_GOT_PROTEIN_FROM_HUEY
 	iftruefwd .SkipGift
 	scall .RematchGift
-	verbosegiveitem PROTEIN
-	iffalsefwd .PackFull
+	verbosegiveitem PROTEIN, iffalsefwd .PackFull
 	setevent EVENT_GOT_PROTEIN_FROM_HUEY
 	sjumpfwd .NumberAccepted
 
@@ -117,8 +127,7 @@ SailorHuey1Script:
 	opentext
 	writetext SailorHueyGiveProteinText
 	waitbutton
-	verbosegiveitem PROTEIN
-	iffalsefwd .PackFull
+	verbosegiveitem PROTEIN, iffalsefwd .PackFull
 	clearevent EVENT_HUEY_PROTEIN
 	setevent EVENT_GOT_PROTEIN_FROM_HUEY
 	sjumpfwd .NumberAccepted
@@ -171,18 +180,6 @@ GentlemanAlfredSeenText:
 GentlemanAlfredBeatenText:
 	text "Ah! I can see that"
 	line "you're serious."
-	done
-
-GentlemanAlfredAfterBattleText:
-	text "Up top is a #-"
-	line "mon that keeps the"
-	cont "Lighthouse lit."
-
-	para "But I hear that"
-	line "it's sick now and"
-
-	para "can't be cured by"
-	line "ordinary medicine."
 	done
 
 GentlemanAlfredFinalText:

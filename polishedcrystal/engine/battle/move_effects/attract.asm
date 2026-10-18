@@ -11,7 +11,7 @@ BattleCommand_attract:
 	call GetBattleVarAddr
 	bit SUBSTATUS_IN_LOVE, [hl]
 	jr nz, .failed
-	call GetOpponentAbilityAfterMoldBreaker
+	call GetOpponentIgnorableAbility
 	cp OBLIVIOUS
 	jr nz, .no_ability_protection
 
@@ -20,8 +20,7 @@ BattleCommand_attract:
 	and a
 	ret nz
 
-	farcall BeginAbility
-	farcall ShowEnemyAbilityActivation
+	farcall BeginAndShowOpponentAbility
 	ld hl, DoesntAffectText
 	call StdBattleTextbox
 	farjp EndAbility
@@ -36,7 +35,7 @@ BattleCommand_attract:
 
 .no_ability_protection
 	; maybe this was called by cute charm
-	farcall ShowPotentialAbilityActivation
+	farcall ShowPendingUserAbility
 	set SUBSTATUS_IN_LOVE, [hl]
 	call AnimateCurrentMove
 
@@ -49,7 +48,7 @@ BattleCommand_attract:
 	cp HELD_DESTINY_KNOT
 	jr nz, .destiny_knot_done
 
-	call GetTrueUserAbility
+	call GetTrueUserIgnorableAbility
 	cp OBLIVIOUS
 	jr nz, .no_user_ability_protection
 
@@ -99,7 +98,7 @@ CheckOpponentMentalHerb:
 	call StackCallOpponentTurn
 CheckMentalHerb:
 	; Check if we hold it
-	predef GetUserItemAfterUnnerve
+	call GetUserItemAfterUnnerve
 	ld a, b
 	cp HELD_MENTAL_HERB
 	ret nz
@@ -167,7 +166,9 @@ CheckMentalHerb:
 	ld hl, CuredDisableWithItem
 	call nz, .print
 
-	jmp ConsumeUserItem
+	call ConsumeUserItem
+	xor a
+	ret
 
 .print
 	push bc

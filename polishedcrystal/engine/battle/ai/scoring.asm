@@ -745,7 +745,8 @@ AI_Smart_HealingLight:
 ; use healing scoring, then -1 in sun, +2 in other weather
 	call AI_Smart_Heal
 
-	call GetWeatherAfterUserUmbrella
+	call GetSolarizedWeather
+	call nz, GetWeatherAfterUserUmbrella
 	and a
 	ret z
 	dec [hl]
@@ -913,7 +914,7 @@ AI_Smart_AvoidIfProtect:
 ; Greatly discourage if the player has Protect. Used for 2-turn moves.
 	; Power Herb makes this a 1-turn move.
 	push hl
-	predef GetUserItemAfterUnnerve
+	farcall GetUserItemAfterUnnerve
 	pop hl
 	ld a, b
 	cp HELD_POWER_HERB
@@ -1544,7 +1545,7 @@ AI_Smart_PerishSong:
 	and a
 	jr nz, .no
 
-	call GetOpponentAbilityAfterMoldBreaker
+	call AIGetOpponentIgnorableAbility
 	cp SOUNDPROOF
 	jr z, .no
 
@@ -1879,7 +1880,7 @@ AI_Smart_JumpKick:
 ; Greatly discourage this move if the player is semi-invulnerable and the enemy
 ; is faster and neither Pokémon has No Guard.
 	; Do nothing if anyone has No Guard.
-	call GetOpponentAbilityAfterMoldBreaker
+	call AIGetOpponentIgnorableAbility
 	cp NO_GUARD
 	ret z
 	call GetTrueUserAbility
@@ -2372,7 +2373,7 @@ AIDamageCalc:
 
 .multihit
 	; Multiply base power by 5 for Skill Link, 4 for Loaded Dice, 3 otherwise
-	predef GetUserItemAfterUnnerve
+	farcall GetUserItemAfterUnnerve
 	ld a, b
 	cp HELD_LOADED_DICE
 	ld b, 4
@@ -2539,7 +2540,7 @@ AI_Status:
 	jr .checkstatus
 .sleep
 	; has 2 abilities, check one of them here
-	call GetOpponentAbilityAfterMoldBreaker
+	call AIGetOpponentIgnorableAbility
 	cp VITAL_SPIRIT
 	jr z, .pop_and_discourage
 
@@ -2593,7 +2594,7 @@ AI_Status:
 .checkstatus_after_items
 	; Check opponent ability
 	push bc
-	call GetOpponentAbilityAfterMoldBreaker
+	call AIGetOpponentIgnorableAbility
 	pop bc
 	cp b
 	jr z, .pop_and_discourage
@@ -2695,6 +2696,21 @@ AIDiscourageMove:
 	ld a, [hl]
 	add 10
 	ld [hl], a
+	ret
+
+AIGetOpponentIgnorableAbility:
+; Variant of GetOpponentIgnorableAbility that pretends that we're ignoring
+; Abilities if the AI has Mold Breaker.
+	call GetTrueUserAbility
+	cp MOLD_BREAKER
+	jmp nz, GetOpponentAbility
+
+	push hl
+	ld hl, wMoveState
+	set MOVESTATE_OPP_IGNOREABIL_F, [hl]
+	call GetOpponentIgnorableAbility
+	res MOVESTATE_OPP_IGNOREABIL_F, [hl]
+	pop hl
 	ret
 
 AIGetEnemyMove:

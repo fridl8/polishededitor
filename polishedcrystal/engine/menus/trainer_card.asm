@@ -315,19 +315,21 @@ TrainerCard_PrintTopHalfOfCard:
 	lb bc, 5, 7
 	xor a
 	ldh [hGraphicStartTile], a
-	predef PlaceGraphic
+	farcall PlaceGraphic
 
 	lb bc, PRINTNUM_MONEY | 3, 7
 	ld hl, wMoney
 	ld a, [hli]
-	cp 1000000 >> 16
-	jr c, .not_seven_digits
+	cp 1000000 >> 16        ; cp $0f
+	jr c, .not_seven_digits ; $0e_ff_ff ==   983_039
+	jr nz, .print_money     ; $10_00_00 == 1_048_576
 	ld a, [hli]
-	cp HIGH(1000000)
-	jr c, .not_seven_digits
+	cp HIGH(1000000)        ; cp $42
+	jr c, .not_seven_digits ; $0f_41_ff ==   999_935
+	jr nz, .print_money     ; $0f_43_00 == 1_000_192
 	ld a, [hl]
-	cp LOW(1000000)
-	jr nc, .print_money
+	cp LOW(1000000)         ; cp $40
+	jr nc, .print_money     ; $0f_42_40 == 1_000_000
 .not_seven_digits
 	dec c
 .print_money
@@ -360,6 +362,7 @@ TrainerCard_Page1_PrintDexCaught_GameTime:
 	ldh a, [hBGMapMode]
 	push af
 	xor a
+	assert NO_BG_MAP_TRANSFER == 0
 	ldh [hBGMapMode], a
 	farcall Pokedex_CountSeenOwn
 	ld de, wTempDexOwn
@@ -702,12 +705,12 @@ TrainerCard_KantoBadgesOAM:
 	db $1c, $20, $24, $20 | $80
 	db $1c | $80, $20, $24, $20 | $80
 
-CardBorderGFX:  INCBIN "gfx/trainer_card/border.2bpp.lz"
+CardBorderGFX:  INCBIN "gfx/trainer_card/border.2bpp.lzp"
 CardDividerGFX: INCBIN "gfx/trainer_card/divider.2bpp"
 CardStatusGFX:  INCBIN "gfx/trainer_card/status.2bpp" ; must come after CardDividerGFX
 CardBadgesGFX:  INCBIN "gfx/trainer_card/badges.2bpp"
 
-LeaderGFX:  INCBIN "gfx/trainer_card/johto_leaders.2bpp.lz"
-LeaderGFX2: INCBIN "gfx/trainer_card/kanto_leaders.2bpp.lz"
-BadgeGFX:   INCBIN "gfx/trainer_card/johto_badges.2bpp.lz"
-BadgeGFX2:  INCBIN "gfx/trainer_card/kanto_badges.2bpp.lz"
+LeaderGFX:  INCBIN "gfx/trainer_card/johto_leaders.2bpp.lzp"
+LeaderGFX2: INCBIN "gfx/trainer_card/kanto_leaders.2bpp.lzp"
+BadgeGFX:   INCBIN "gfx/trainer_card/johto_badges.2bpp.lzp"
+BadgeGFX2:  INCBIN "gfx/trainer_card/kanto_badges.2bpp.lzp"

@@ -37,10 +37,10 @@ _MainMenu:
 NewGame_ClearTileMapEtc:
 	xor a
 	ldh [hMapAnims], a
-	ld a, '<BLACK>'
-	call FillTileMap
 	call LoadFrame
 	call LoadStandardFont
+	ld a, '<BLACK>'
+	call FillTileMap
 	jmp ClearWindowData
 
 NewGamePlus:
@@ -49,6 +49,7 @@ NewGamePlus:
 	call YesNoBox
 	jr c, _MainMenu
 	xor a
+	assert NO_BG_MAP_TRANSFER == 0
 	ldh [hBGMapMode], a
 	farcall TryLoadSaveFile
 	ret c
@@ -71,14 +72,17 @@ NewGamePlus:
 
 NewGame:
 	xor a
+	assert NO_BG_MAP_TRANSFER == 0
 	ldh [hBGMapMode], a
 	call ResetWRAM_NotPlus
 _NewGame_FinishSetup:
 	call ResetWRAM
 	farcall ClearSavedObjPals
+	ld a, -1
+	ld [wOvercastRandomDay], a
 	call NewGame_ClearTileMapEtc
 	call WarnVBA
-	call SetInitialOptions
+	farcall DexNav_SetInitialOptions ; also clears DexNav search levels
 	call ProfElmSpeech
 	call InitializeWorld
 	ld a, 1
@@ -335,12 +339,12 @@ LoadOrRegenerateLuckyIDNumber:
 	jmp CloseSRAM
 
 Continue:
-	farcall TryLoadSaveFile
+	farcall DexNav_TryLoadSaveFile ; also loads DexNav search levels
 	ret c
 
 	call LoadStandardMenuHeader
 	call DisplaySaveInfoOnContinue
-	ld a, $1
+	ld a, TRANSFER_TILEMAP
 	ldh [hBGMapMode], a
 	ld c, 20
 	call DelayFrames
@@ -400,7 +404,7 @@ ConfirmContinue:
 	ret
 
 WarnVBA:
-	call CheckVBA
+	farcall CheckVBA
 	ret z
 if !DEF(DEBUG)
 	ld hl, .WarnVBAText
@@ -417,9 +421,7 @@ else
 endc
 
 .WarnVBAText:
-	text_far _WarnVBAText
-	text_end
-
+	text_farend _WarnVBAText
 Continue_CheckRTC_RestartClock:
 	call CheckRTCStatus
 	and %10000000 ; Day count exceeded 16383
@@ -434,7 +436,9 @@ Continue_CheckRTC_RestartClock:
 Continue_CheckEGO_ResetInitialOptions:
 	ld a, [wInitialOptions2]
 	bit RESET_INIT_OPTS, a
-	call nz, SetInitialOptions
+	jr z, .skip_reset_initial_options
+	farcall SetInitialOptions
+.skip_reset_initial_options
 	; fallthrough
 Continue_FinishReset:
 	xor a
@@ -487,6 +491,7 @@ DisplayContinueDataWithRTCError:
 
 Continue_LoadMenuHeader:
 	xor a
+	assert NO_BG_MAP_TRANSFER == 0
 	ldh [hBGMapMode], a
 	ld hl, .MenuDataHeader_Dex
 	ld a, [wStatusFlags]
@@ -692,9 +697,7 @@ endc
 	jmp PrintText
 
 ElmText1:
-	text_far _ElmText1
-	text_end
-
+	text_farend _ElmText1
 ElmText2:
 	text_far _ElmText2
 	text_asm
@@ -704,25 +707,15 @@ ElmText2:
 	ret
 
 ElmText3:
-	text_far Text_Waitbutton_2
-	text_end
-
+	text_farend Text_Waitbutton_2
 ElmText4:
-	text_far _ElmText4
-	text_end
-
+	text_farend _ElmText4
 ElmText5:
-	text_far _ElmText5
-	text_end
-
+	text_farend _ElmText5
 ElmText6:
-	text_far _ElmText6
-	text_end
-
+	text_farend _ElmText6
 ElmText7:
-	text_far _ElmText7
-	text_end
-
+	text_farend _ElmText7
 InitGender:
 	ld c, 15
 	call FadeToWhite
@@ -763,67 +756,76 @@ InitGender:
 GenderMenu::
 	; erase previous cursors
 	ld a, ' '
-	hlcoord 2, 3
-	ld [hli], a
-	ld [hl], a
-	hlcoord 9, 3
-	ld [hli], a
-	ld [hl], a
-	hlcoord 16, 3
-	ld [hli], a
-	ld [hl], a
+	ldcoord_a  2, 3
+	ldcoord_a  7, 3
+	ldcoord_a 12, 3
+	ldcoord_a 17, 3
 
 	ld a, [wPlayerGender]
 	and a ; PLAYER_MALE
 	jr z, .male
 	dec a ; PLAYER_FEMALE
 	jr z, .female
+	dec a ; PLAYER_ENBY
+	jr z, .enby
 
-; PLAYER_ENBY
+; PLAYER_BETA
 	; place cursor
-	ld a, $69
-	hlcoord 16, 3
-	ld [hli], a
-	inc a
-	ld [hl], a
+	ld a, '▼'
+	ldcoord_a 17, 3
 	; load opaque palettes
 	call SetDefaultBGPAndOBP
 	; make other palettes transparent
-	ld hl, wBGPals2 palette 0 + 2
+	ld hl, wBGPals2 palette 0 + 2 ; male
 	call .MakeTransparent
-	ld hl, wBGPals2 palette 2 + 2
+	ld hl, wBGPals2 palette 2 + 2 ; female
+	call .MakeTransparent
+	ld hl, wBGPals2 palette 3 + 2 ; enby
 	call .MakeTransparent
 	jr .ready
 
 .male
 	; place cursor
-	ld a, $69
-	hlcoord 2, 3
-	ld [hli], a
-	inc a
-	ld [hl], a
+	ld a, '▼'
+	ldcoord_a 2, 3
 	; load opaque palettes
 	call SetDefaultBGPAndOBP
 	; make other palettes transparent
-	ld hl, wBGPals2 palette 2 + 2
+	ld hl, wBGPals2 palette 2 + 2 ; female
 	call .MakeTransparent
-	ld hl, wBGPals2 palette 3 + 2
+	ld hl, wBGPals2 palette 3 + 2 ; enby
+	call .MakeTransparent
+	ld hl, wBGPals2 palette 4 + 2 ; beta
 	call .MakeTransparent
 	jr .ready
 
 .female
 	; place cursor
-	ld a, $69
-	hlcoord 9, 3
-	ld [hli], a
-	inc a
-	ld [hl], a
+	ld a, '▼'
+	ldcoord_a 7, 3
 	; load opaque palettes
 	call SetDefaultBGPAndOBP
 	; make other paletees transparent
-	ld hl, wBGPals2 palette 0 + 2
+	ld hl, wBGPals2 palette 0 + 2 ; male
 	call .MakeTransparent
-	ld hl, wBGPals2 palette 3 + 2
+	ld hl, wBGPals2 palette 3 + 2 ; enby
+	call .MakeTransparent
+	ld hl, wBGPals2 palette 4 + 2 ; beta
+	call .MakeTransparent
+	jr .ready
+
+.enby
+	; place cursor
+	ld a, '▼'
+	ldcoord_a 12, 3
+	; load opaque palettes
+	call SetDefaultBGPAndOBP
+	; make other palettes transparent
+	ld hl, wBGPals2 palette 0 + 2 ; male
+	call .MakeTransparent
+	ld hl, wBGPals2 palette 2 + 2 ; female
+	call .MakeTransparent
+	ld hl, wBGPals2 palette 4 + 2 ; beta
 	call .MakeTransparent
 	; fallthrough
 
@@ -846,16 +848,16 @@ GenderMenu::
 	jr z, .loop
 
 	ld a, [wPlayerGender]
-	and a ; PLAYER_MALE
+	and a ; first gender
 	jr z, .got_gender
-	dec a ; female->male, enby->female
+	dec a
 	jr .got_gender
 
 .d_right
 	ld a, [wPlayerGender]
-	cp PLAYER_ENBY
+	cp NUM_PLAYER_GENDERS - 1 ; last gender
 	jr z, .got_gender
-	inc a ; male->female, female->enby
+	inc a
 .got_gender
 	ld [wPlayerGender], a
 	jmp GenderMenu
@@ -880,95 +882,83 @@ GenderMenu::
 
 AreYouABoyOrAreYouAGirlText:
 	; Are you a boy? Or are you a girl?
-	text_far Text_AreYouABoyOrAreYouAGirl
-	text_end
-
+	text_farend Text_AreYouABoyOrAreYouAGirl
 SoThisIsYouText:
 	; So this is you?
-	text_far Text_SoThisIsYou
-	text_end
-
+	text_farend Text_SoThisIsYou
 InitGenderGraphics:
-	ld hl, ChrisCardPic
+	ld hl, CalPic
 	ld de, vTiles2 tile $00
-	lb bc, BANK(ChrisCardPic), 5 * 7
-	call DecompressRequest2bpp
-	ld hl, KrisCardPic
+	ld b, BANK(CalPic)
+	call .DecompressRequestPicSlice
+	ld hl, CarriePic
 	ld de, vTiles2 tile $23
-	lb bc, BANK(KrisCardPic), 5 * 7
-	call DecompressRequest2bpp
-	ld hl, CrysCardPic
+	ld b, BANK(CarriePic)
+	call .DecompressRequestPicSlice
+	ld hl, JackyPic
 	ld de, vTiles2 tile $46
-	lb bc, BANK(CrysCardPic), 5 * 7
-	call DecompressRequest2bpp
-
-; Shift the "▼" character three pixels to the right across two tiles
-	farcall LoadStandardFontPointer
-	ld de, ('▼' - $80) * TILE_1BPP_SIZE
-	add hl, de
-	ld de, wOverworldMapBlocks
-	ld c, TILE_1BPP_SIZE
-.loop
-	ld a, BANK(FontTiles)
-	call GetFarByte
-	ld b, 0
-rept 3
-	srl a
-	rr b
-endr
-	ld [de], a
-	push hl
-	ld hl, TILE_SIZE
-	add hl, de
-	ld [hl], b ; no-optimize *hl++|*hl-- = b|c|d|e
-	inc hl
-	ld [hl], b
-	pop hl
-	inc hl
-	inc de
-	ld [de], a
-	inc de
-	dec c
-	jr nz, .loop
-	ld hl, vTiles2 tile $69
-	ld de, wOverworldMapBlocks
-	ld c, 2
-	call Request2bppInWRA6
+	ld b, BANK(JackyPic)
+	call .DecompressRequestPicSlice
+	ld a, 1
+	ldh [rVBK], a
+	ld hl, EunaPic
+	ld de, vTiles5 tile $00
+	ld b, BANK(EunaPic)
+	call .DecompressRequestPicSlice
+	xor a
+	ldh [rVBK], a
 
 	xor a
 	ldh [hGraphicStartTile], a
 	hlcoord 0, 4
 	lb bc, 5, 7
-	predef PlaceGraphic
+	farcall PlaceGraphic
 	ld a, $23
 	ldh [hGraphicStartTile], a
-	hlcoord 7, 4
+	hlcoord 5, 4
 	lb bc, 5, 7
-	predef PlaceGraphic
+	farcall PlaceGraphic
 	ld a, $46
 	ldh [hGraphicStartTile], a
-	hlcoord 14, 4
+	hlcoord 10, 4
 	lb bc, 5, 7
-	predef_jump PlaceGraphic
+	farcall PlaceGraphic
+	xor a
+	ldh [hGraphicStartTile], a
+	hlcoord 15, 4
+	lb bc, 5, 7
+	farjp PlaceGraphic
+
+.DecompressRequestPicSlice:
+	push de
+	call FarDecompressWRA6InB
+	pop hl
+	ld de, wDecompressScratch tile $07
+	ld c, 5 * 7
+	jmp Request2bppInWRA6
 
 NamePlayer:
 	ld b, $1 ; player
 	ld de, wPlayerName
 	farcall NamingScreen
-	ld hl, wPlayerName
 	ld a, [wPlayerGender]
-	ld de, DefaultMalePlayerName
-	and a ; PLAYER_MALE
-	jr z, .done
-	ld de, DefaultFemalePlayerName
-	dec a ; PLAYER_FEMALE
-	jr z, .done
-	; PLAYER_ENBY
-	ld de, DefaultEnbyPlayerName
-.done:
+	assert NAME_LENGTH == 11
+	ld d, a
+	add a ; * 2
+	ld e, a
+	add a ; * 4
+	add a ; * 8
+	add e ; * 10
+	add d ; * 11
+	add LOW(DefaultPlayerNames)
+	ld e, a
+	adc HIGH(DefaultPlayerNames)
+	sub e
+	ld d, a
+	ld hl, wPlayerName
 	jmp InitName
 
-INCLUDE "data/default_player_names.asm"
+INCLUDE "data/player/default_names.asm"
 
 ShrinkPlayer:
 	ld a, 0 << 7 | 32 ; fade out
@@ -1037,17 +1027,11 @@ DrawIntroPlayerPic:
 	xor a
 	ld [wCurPartySpecies], a
 	ld a, [wPlayerGender]
-	ld b, CAL
-	and a ; PLAYER_MALE
-	jr z, .ok
-	assert CAL - 1 == CARRIE
-	dec b
-	dec a ; PLAYER_FEMALE
-	jr z, .ok
-	; PLAYER_ENBY
-	ld b, JACKY
-.ok
-	ld a, b
+	assert PLAYER_MALE + 1 == CAL
+	assert PLAYER_FEMALE + 1 == CARRIE
+	assert PLAYER_ENBY + 1 == JACKY
+	assert PLAYER_BETA + 1 == EUNA
+	inc a
 	ld [wTrainerClass], a
 Intro_PrepTrainerPic:
 	ld de, vTiles2
@@ -1063,7 +1047,7 @@ FinishPrepIntroPic:
 	ldh [hGraphicStartTile], a
 	hlcoord 6, 4
 	lb bc, 7, 7
-	predef_jump PlaceGraphic
+	farjp PlaceGraphic
 
 Intro_PlacePlayerSprite:
 	farcall GetPlayerIcon
@@ -1390,7 +1374,7 @@ Copyright:
 	call LoadFrame
 	ld hl, CopyrightGFX
 	ld de, vTiles2 tile $60
-	lb bc, BANK(CopyrightGFX), $1d
+	lb bc, BANK(CopyrightGFX), $1e
 	call DecompressRequest2bpp
 	hlcoord 2, 7
 	ld de, CopyrightString
@@ -1398,16 +1382,4 @@ Copyright:
 	ret
 
 CopyrightString:
-	; ©1995-2001 Nintendo
-	db $60, $61, $62, $63, $64, $65, $66
-	db $67, $68, $69, $6a, $6b, $6c
-
-	; ©1995-2001 Creatures inc.
-	db "<NEXT>"
-	db $60, $61, $62, $63, $64, $65, $66
-	db $6d, $6e, $6f, $70, $71, $72, $7a, $7b, $7c
-
-	; ©1995-2001 GAME FREAK inc.
-	db "<NEXT>"
-	db $60, $61, $62, $63, $64, $65, $66
-	db $73, $74, $75, $76, $77, $78, $79, $7a, $7b, $7c, "@"
+INCLUDE "data/copyright.asm"

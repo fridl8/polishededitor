@@ -1,5 +1,8 @@
 CherrygroveCity_MapScriptHeader:
 	def_scene_scripts
+	scene_const SCENE_CHERRYGROVECITY_GUIDE_GENT
+	scene_const SCENE_CHERRYGROVECITY_MEET_RIVAL
+	scene_const SCENE_CHERRYGROVECITY_NOOP
 
 	def_callbacks
 	callback MAPCALLBACK_NEWMAP, CherrygroveCityFlyPoint
@@ -12,9 +15,9 @@ CherrygroveCity_MapScriptHeader:
 	warp_event 31, 11, CHERRYGROVE_EVOLUTION_SPEECH_HOUSE, 1
 
 	def_coord_events
-	coord_event 33,  7, 0, CherrygroveGuideGentTrigger
-	coord_event 33,  6, 1, CherrygroveRivalTriggerNorth
-	coord_event 33,  7, 1, CherrygroveRivalTriggerSouth
+	coord_event 33,  7, SCENE_CHERRYGROVECITY_GUIDE_GENT, CherrygroveGuideGentTrigger
+	coord_event 33,  6, SCENE_CHERRYGROVECITY_MEET_RIVAL, CherrygroveRivalTriggerNorth
+	coord_event 33,  7, SCENE_CHERRYGROVECITY_MEET_RIVAL, CherrygroveRivalTriggerSouth
 
 	def_bg_events
 	bg_event 30,  8, BGEVENT_JUMPTEXT, CherrygroveCitySignText
@@ -28,7 +31,7 @@ CherrygroveCity_MapScriptHeader:
 	object_event 25, 13, SPRITE_POKEFAN_F, SPRITEMOVEDATA_STANDING_DOWN, 0, 1, -1, PAL_NPC_BLUE, OBJECTTYPE_COMMAND, jumptextfaceplayer, CherrygroveTeacherText_HaveMapCard, -1
 	object_event 23,  7, SPRITE_YOUNGSTER, SPRITEMOVEDATA_WALK_LEFT_RIGHT, 0, 1, -1, PAL_NPC_RED, OBJECTTYPE_SCRIPT, 0, CherrygroveYoungsterScript, -1
 	object_event  7, 12, SPRITE_FISHER, SPRITEMOVEDATA_STANDING_RIGHT, 0, 0, -1, 0, OBJECTTYPE_SCRIPT, 0, MysticWaterGuy, -1
-	pokemon_event 26, 13, PIDGEY, SPRITEMOVEDATA_POKEMON, -1, PAL_NPC_BROWN, CherrygrovePidgeyText, -1
+	pokemon_event 26, 13, PIDGEY, SPRITEMOVEDATA_POKEMON, -1, PAL_MON_BROWN, CherrygrovePidgeyText, -1
 
 	object_const_def
 	const CHERRYGROVECITY_GRAMPS
@@ -81,7 +84,7 @@ CherrygroveCityGuideGent:
 	playsound SFX_ENTER_DOOR
 	disappear CHERRYGROVECITY_GRAMPS
 	clearevent EVENT_GUIDE_GENT_VISIBLE_IN_CHERRYGROVE
-	setscene $2
+	setscene SCENE_CHERRYGROVECITY_NOOP
 	waitsfx
 	end
 
@@ -145,7 +148,7 @@ CherrygroveRivalTriggerNorth:
 	applymovement CHERRYGROVECITY_RIVAL, CherrygroveCity_RivalExitsStageLeft
 	disappear CHERRYGROVECITY_RIVAL
 	special HealParty
-	setscene $2
+	setscene SCENE_CHERRYGROVECITY_NOOP
 	playmusic MUSIC_CHERRYGROVE_CITY
 	end
 
@@ -166,8 +169,7 @@ MysticWaterGuy:
 	opentext
 	writetext MysticWaterGuyTextBefore
 	promptbutton
-	verbosegiveitem MYSTIC_WATER
-	iffalse_endtext
+	verbosegiveitem MYSTIC_WATER, iffalse_endtext
 	setevent EVENT_GOT_MYSTIC_WATER_IN_CHERRYGROVE
 	jumpthisopenedtext
 
@@ -206,19 +208,13 @@ GuideGentMovement3_5:
 	step_end
 
 GuideGentMovement4:
-	step_left
-	step_left
-	step_left
+	step_down
 	step_down
 	step_down
 	turn_head_left
 	step_end
 
 GuideGentMovement5:
-	step_down
-	step_right
-	step_right
-	step_right
 	step_right
 	step_right
 	step_right

@@ -30,7 +30,10 @@ RadioTower1F_MapScriptHeader:
 RadioTower1FReceptionistScript:
 	checkflag ENGINE_ROCKETS_IN_RADIO_TOWER
 	iftrue_jumptextfaceplayer RadioTower1FReceptionistNoToursText
-	jumptextfaceplayer RadioTower1FReceptionistWelcomeText
+	jumpthistextfaceplayer
+
+	text "Welcome!"
+	done
 
 RadioTower1FLuckyNumberManScript:
 	faceplayer
@@ -71,38 +74,47 @@ RadioTower1FLuckyNumberManScript:
 	ifequalfwd 3, .ThirdPlace
 	ifequalfwd 2, .FourthPlace
 	ifequalfwd 1, .FifthPlace
-	jumpopenedtext RadioTower1FLuckyNumberManNoneOfYourIDNumbersMatchText
+	jumpthisopenedtext
+
+	text "Nope, none of your"
+	line "ID numbers match."
+	done
 
 .FirstPlace:
-	giveitem MASTER_BALL
+	; The shared .Finish script checks for room after the prize fanfare.
+	giveitem_unsafe MASTER_BALL
 	writetext WonFirstPlaceText
 	special ShowItemIcon
 	playsound SFX_1ST_PLACE
 	sjumpfwd .Finish
 
 .SecondPlace:
-	giveitem BOTTLE_CAP
+	; The shared .Finish script checks for room after the prize fanfare.
+	giveitem_unsafe BOTTLE_CAP
 	writetext WonSecondPlaceText
 	special ShowItemIcon
 	playsound SFX_2ND_PLACE
 	sjumpfwd .Finish
 
 .ThirdPlace:
-	giveitem PP_MAX
+	; The shared .Finish script checks for room after the prize fanfare.
+	giveitem_unsafe PP_MAX
 	writetext WonThirdPlaceText
 	special ShowItemIcon
 	playsound SFX_2ND_PLACE
 	sjumpfwd .Finish
 
 .FourthPlace:
-	giveitem PP_UP
+	; The shared .Finish script checks for room after the prize fanfare.
+	giveitem_unsafe PP_UP
 	writetext WonFourthPlaceText
 	special ShowItemIcon
 	playsound SFX_3RD_PLACE
 	sjumpfwd .Finish
 
 .FifthPlace:
-	giveitem RARE_CANDY
+	; The shared .Finish script checks for room after the prize fanfare.
+	giveitem_unsafe RARE_CANDY
 	writetext WonFifthPlaceText
 	special ShowItemIcon
 	playsound SFX_3RD_PLACE
@@ -227,9 +239,6 @@ RadioTower1FWhitneyLeaves2MovementData:
 	step_left
 	step_end
 
-RadioTower1FReceptionistWelcomeText:
-	text "Welcome!"
-	done
 
 RadioTower1FReceptionistNoToursText:
 	text "Hello. I'm sorry,"
@@ -327,10 +336,6 @@ WonFifthPlaceText:
 	cont "Rare Candy."
 	done
 
-RadioTower1FLuckyNumberManNoneOfYourIDNumbersMatchText:
-	text "Nope, none of your"
-	line "ID numbers match."
-	done
 
 RadioTower1FLuckyNumberManNoRoomForYourPrizeText:
 	text "You've got no room"

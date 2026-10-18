@@ -67,6 +67,7 @@ GetMenuNumberOfRows:
 
 Draw2DMenu:
 	xor a
+	assert NO_BG_MAP_TRANSFER == 0
 	ldh [hBGMapMode], a
 	call MenuBox
 
@@ -234,8 +235,9 @@ MenuJoypadLoop:
 .BGMap_OAM:
 	ldh a, [hOAMUpdate]
 	push af
-	ld a, $1
+	ld a, 1
 	ldh [hOAMUpdate], a
+	assert TRANSFER_TILEMAP == 1
 	ldh [hBGMapMode], a
 	ld a, [w2DMenuFlags1]
 	bit 6, a
@@ -244,6 +246,7 @@ MenuJoypadLoop:
 	pop af
 	ldh [hOAMUpdate], a
 	xor a
+	assert NO_BG_MAP_TRANSFER == 0
 	ldh [hBGMapMode], a
 	ret
 
@@ -263,10 +266,11 @@ Menu_WasButtonPressed:
 	ld a, [w2DMenuFlags1]
 	bit 6, a
 	jr z, .skip_to_joypad
-	ld a, $1
+	ld a, TRANSFER_TILEMAP
 	ldh [hBGMapMode], a
 	farcall PlaySpriteAnimationsAndDelayFrame
 	xor a
+	assert NO_BG_MAP_TRANSFER == 0
 	ldh [hBGMapMode], a
 
 .skip_to_joypad
@@ -556,11 +560,9 @@ _PushWindow::
 	; Check if a window stack overflow happened.
 	ld a, d
 	cp $d0
-	jr nc, .no_overflow
-	ld a, ERR_WINSTACK_OVERFLOW
-	jmp Crash
+	ld a, ERR_WINDOW_OVERFLOW
+	jmp c, Crash
 
-.no_overflow
 	ld hl, wWindowStackPointer
 	ld a, e
 	ld [hli], a
@@ -646,17 +648,22 @@ RestoreTileBackup::
 
 _ExitMenu::
 	xor a
+	assert NO_BG_MAP_TRANSFER == 0
 	ldh [hBGMapMode], a
 
 	ldh a, [rWBK]
 	push af
 	ld a, $7
 	ldh [rWBK], a
-
 	call GetWindowStackTop
+
+	; Check if a window stack underflow happened.
+	; (Formerly the "No windows available for popping." freeze)
 	ld a, l
 	or h
-	jr z, Error_Cant_ExitMenu
+	ld a, ERR_WINDOW_UNDERFLOW
+	jmp z, Crash
+
 	ld a, l
 	ld [wWindowStackPointer], a
 	ld a, h
@@ -680,17 +687,6 @@ _ExitMenu::
 	ld hl, wWindowStackSize
 	dec [hl]
 	ret
-
-Error_Cant_ExitMenu:
-	ld hl, .Text_NoWindowsAvailableForPopping
-	call PrintText
-	call ApplyTilemapInVBlank
-.infinite_loop
-	jr .infinite_loop ; no-optimize stub jump
-
-.Text_NoWindowsAvailableForPopping:
-	text_far _WindowPoppingErrorText
-	text_end
 
 _InitVerticalMenuCursor::
 	ld a, [wMenuDataFlags]

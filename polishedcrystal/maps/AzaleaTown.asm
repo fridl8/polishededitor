@@ -1,5 +1,8 @@
 AzaleaTown_MapScriptHeader:
 	def_scene_scripts
+	scene_const SCENE_AZALEATOWN_NOOP
+	scene_const SCENE_AZALEATOWN_RIVAL_BATTLE
+	scene_const SCENE_AZALEATOWN_CELEBI_EVENT
 
 	def_callbacks
 	callback MAPCALLBACK_NEWMAP, AzaleaTownFlypointCallback
@@ -16,14 +19,14 @@ AzaleaTown_MapScriptHeader:
 	warp_event  2, 11, ILEX_FOREST_AZALEA_GATE, 4
 
 	def_coord_events
-	coord_event  5, 10, 1, AzaleaTownRivalBattleTrigger1
-	coord_event  5, 11, 1, AzaleaTownRivalBattleTrigger2
-	coord_event  9,  6, 2, AzaleaTown_CelebiTrigger
+	coord_event  5, 10, SCENE_AZALEATOWN_RIVAL_BATTLE, AzaleaTownRivalBattleTrigger1
+	coord_event  5, 11, SCENE_AZALEATOWN_RIVAL_BATTLE, AzaleaTownRivalBattleTrigger2
+	coord_event  9,  6, SCENE_AZALEATOWN_CELEBI_EVENT, AzaleaTown_CelebiTrigger
 
 	def_bg_events
 	bg_event 19,  9, BGEVENT_JUMPTEXT, AzaleaTownSignText
 	bg_event 10,  9, BGEVENT_JUMPTEXT, KurtsHouseSignText
-	bg_event 14, 15, BGEVENT_JUMPTEXT, AzaleaGymSignText
+	bg_event 11, 15, BGEVENT_JUMPTEXT, AzaleaGymSignText
 	bg_event 29,  8, BGEVENT_JUMPTEXT, SlowpokeWellSignText
 	bg_event 19, 13, BGEVENT_JUMPTEXT, CharcoalKilnSignText
 	bg_event  3,  9, BGEVENT_JUMPTEXT, AzaleaTownIlexForestSignText
@@ -38,13 +41,13 @@ AzaleaTown_MapScriptHeader:
 	object_event  7,  9, SPRITE_CAMPER, SPRITEMOVEDATA_WALK_LEFT_RIGHT, 0, 1, -1, 0, OBJECTTYPE_COMMAND, jumptextfaceplayer, AzaleaTownYoungsterText, -1
 	object_event 31,  9, SPRITE_ROCKET, SPRITEMOVEDATA_STANDING_DOWN, 0, 0, -1, 0, OBJECTTYPE_COMMAND, jumptextfaceplayer, AzaleaTownRocket1Text, EVENT_AZALEA_TOWN_SLOWPOKETAIL_ROCKET
 	object_event 10, 16, SPRITE_ROCKET, SPRITEMOVEDATA_STANDING_DOWN, 0, 0, -1, 0, OBJECTTYPE_COMMAND, jumptextfaceplayer, AzaleaTownRocket2Text, EVENT_SLOWPOKE_WELL_ROCKETS
-	object_event  8, 17, SPRITE_MON_ICON, SPRITEMOVEDATA_POKEMON, 0, SLOWPOKE, -1, PAL_NPC_PINK, OBJECTTYPE_SCRIPT, PLAIN_FORM, AzaleaTownSlowpokeScript, EVENT_AZALEA_TOWN_SLOWPOKES
-	object_event 18,  9, SPRITE_MON_ICON, SPRITEMOVEDATA_POKEMON, 0, SLOWPOKE, -1, PAL_NPC_PINK, OBJECTTYPE_SCRIPT, PLAIN_FORM, AzaleaTownSlowpokeScript, EVENT_AZALEA_TOWN_SLOWPOKES
-	object_event 30,  9, SPRITE_MON_ICON, SPRITEMOVEDATA_POKEMON, 0, SLOWPOKE, -1, PAL_NPC_PINK, OBJECTTYPE_SCRIPT, PLAIN_FORM, AzaleaTownSlowpokeScript, EVENT_AZALEA_TOWN_SLOWPOKES
-	object_event 15, 15, SPRITE_MON_ICON, SPRITEMOVEDATA_POKEMON, 0, SLOWPOKE, -1, PAL_NPC_PINK, OBJECTTYPE_SCRIPT, PLAIN_FORM, AzaleaTownSlowpokeScript, EVENT_AZALEA_TOWN_SLOWPOKES
-	pokemon_event 14, 12, WOOPER, SPRITEMOVEDATA_POKEMON, -1, PAL_NPC_BLUE, AzaleaTownWoosterText, EVENT_SLOWPOKE_WELL_SLOWPOKES
-	pokemon_event 14, 12, QUAGSIRE, SPRITEMOVEDATA_POKEMON, -1, PAL_NPC_BLUE, AzaleaTownWoosterText, EVENT_AZALEA_TOWN_SLOWPOKES
-	fruittree_event  8,  2, FRUITTREE_AZALEA_TOWN, WHT_APRICORN, PAL_NPC_WHITE
+	object_event  8, 17, SPRITE_MON_ICON, SPRITEMOVEDATA_POKEMON, 0, SLOWPOKE, -1, PAL_MON_PINK, OBJECTTYPE_SCRIPT, PLAIN_FORM, AzaleaTownSlowpokeScript, EVENT_AZALEA_TOWN_SLOWPOKES
+	object_event 18,  9, SPRITE_MON_ICON, SPRITEMOVEDATA_POKEMON, 0, SLOWPOKE, -1, PAL_MON_PINK, OBJECTTYPE_SCRIPT, PLAIN_FORM, AzaleaTownSlowpokeScript, EVENT_AZALEA_TOWN_SLOWPOKES
+	object_event 30,  9, SPRITE_MON_ICON, SPRITEMOVEDATA_POKEMON, 0, SLOWPOKE, -1, PAL_MON_PINK, OBJECTTYPE_SCRIPT, PLAIN_FORM, AzaleaTownSlowpokeScript, EVENT_AZALEA_TOWN_SLOWPOKES
+	object_event 14, 15, SPRITE_MON_ICON, SPRITEMOVEDATA_POKEMON, 0, SLOWPOKE, -1, PAL_MON_PINK, OBJECTTYPE_SCRIPT, PLAIN_FORM, AzaleaTownSlowpokeScript, EVENT_AZALEA_TOWN_SLOWPOKES
+	pokemon_event 14, 12, WOOPER, SPRITEMOVEDATA_POKEMON, -1, PAL_MON_BLUE, AzaleaTownWoosterText, EVENT_SLOWPOKE_WELL_SLOWPOKES
+	pokemon_event 14, 12, QUAGSIRE, SPRITEMOVEDATA_POKEMON, -1, PAL_MON_BLUE, AzaleaTownWoosterText, EVENT_AZALEA_TOWN_SLOWPOKES
+	fruittree_event  8,  2, FRUITTREE_AZALEA_TOWN, WHT_APRICORN, PAL_NPC_ENV_WHITE
 
 	object_const_def
 	const AZALEATOWN_RIVAL
@@ -116,8 +119,8 @@ AzaleaTownRivalBattleTrigger2:
 	applymovement AZALEATOWN_RIVAL, .ExitMovement
 	playsound SFX_EXIT_BUILDING
 	disappear AZALEATOWN_RIVAL
-	setmapscene ROUTE_34, $1
-	setscene $0
+	setmapscene ROUTE_34, SCENE_ROUTE34_LYRA_DAYCARE
+	setscene SCENE_AZALEATOWN_NOOP
 	waitsfx
 	playmapmusic
 	end
@@ -223,7 +226,7 @@ AzaleaTown_CelebiTrigger:
 	setflag ENGINE_HAVE_EXAMINED_GS_BALL
 	clearevent EVENT_ILEX_FOREST_LASS
 	setevent EVENT_ROUTE_34_ILEX_FOREST_GATE_LASS
-	setscene $0
+	setscene SCENE_AZALEATOWN_NOOP
 	endtext
 
 .WalkOutOfKurtsHouseMovement:
@@ -331,8 +334,7 @@ AzaleaTownTeacherScript:
 	opentext
 	writetext .Text3
 	promptbutton
-	verbosegiveitem CLEAR_AMULET
-	iffalse_endtext
+	verbosegiveitem CLEAR_AMULET, iffalse_endtext
 	setevent EVENT_GOT_CLEAR_AMULET_IN_AZALEA
 	jumpthisopenedtext
 

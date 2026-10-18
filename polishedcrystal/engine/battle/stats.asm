@@ -49,7 +49,7 @@ FarChangeStat:
 	; Do target-only checks
 	bit STAT_TARGET_F, b
 	jr nz, .is_target
-	call GetTrueUserAbility
+	call GetTrueUserIgnorableAbility
 	cp CONTRARY
 	jmp nz, .perform_change
 	ld a, b
@@ -58,7 +58,7 @@ FarChangeStat:
 	jmp .perform_change
 
 .is_target
-	call GetOpponentAbilityAfterMoldBreaker
+	call GetOpponentIgnorableAbility
 	cp CONTRARY
 	jr nz, .no_target_contrary
 	ld a, b
@@ -72,7 +72,7 @@ FarChangeStat:
 
 	bit STAT_SILENT_F, b
 	ret nz
-	farcall ShowPotentialAbilityActivation
+	farcall ShowPendingUserAbility
 	farcall CheckAlreadyExecuted
 	ret nz
 	farcall AnimateFailedMove
@@ -92,7 +92,7 @@ FarChangeStat:
 	jr nz, .mist_or_item_fail
 
 .check_ability
-	call GetOpponentAbilityAfterMoldBreaker
+	call GetOpponentIgnorableAbility
 	cp CLEAR_BODY
 	jr z, .ability_immune
 	cp WHITE_SMOKE
@@ -120,9 +120,8 @@ FarChangeStat:
 	ret nz
 	farcall CheckAlreadyExecuted
 	ret nz
-	farcall ShowPotentialAbilityActivation
-	farcall BeginAbility
-	farcall ShowEnemyAbilityActivation
+	farcall ShowPendingUserAbility
+	farcall BeginAndShowOpponentAbility
 	farcall AnimateFailedMove
 	ld hl, DoesntAffectText
 	call StdBattleTextbox
@@ -146,7 +145,7 @@ FarChangeStat:
 	pop hl
 	ret nz
 	push hl
-	farcall ShowPotentialAbilityActivation
+	farcall ShowPendingUserAbility
 	farcall AnimateFailedMove
 	pop hl
 	jmp StdBattleTextbox
@@ -176,7 +175,7 @@ FarChangeStat:
 	bit STAT_SILENT_F, b
 	ret nz
 	push bc
-	farcall ShowPotentialAbilityActivation
+	farcall ShowPendingUserAbility
 	ld c, 60
 	call DelayFrames
 	pop bc
@@ -193,7 +192,7 @@ FarChangeStat:
 	jr nz, .anim_done
 	farcall StatUpDownAnim
 .anim_done
-	farcall ShowPotentialAbilityActivation
+	farcall ShowPendingUserAbility
 	pop bc
 PrintStatChange:
 	call GetStatRaiseMessage

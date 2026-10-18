@@ -106,7 +106,7 @@ GameFreakPresentsInit:
 	ld [wIntroSceneTimer], a
 	ldh [hSCX], a
 	ldh [hSCY], a
-	ld a, 1
+	ld a, TRANSFER_TILEMAP
 	ldh [hBGMapMode], a
 	ld a, 144
 	ldh [hWY], a
@@ -325,4 +325,4 @@ INCBIN "gfx/splash/logo1.1bpp"
 INCBIN "gfx/splash/logo2.1bpp"
 
 GameFreakDittoGFX:
-INCBIN "gfx/splash/ditto.2bpp.lz"
+INCBIN "gfx/splash/ditto.2bpp.lzp"

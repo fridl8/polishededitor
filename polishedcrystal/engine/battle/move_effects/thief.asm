@@ -22,7 +22,7 @@ BattleCommand_thief:
 
 	xor a
 	ld [bc], a
-	farcall ShowPotentialAbilityActivation
+	farcall ShowPendingUserAbility
 	ld a, d
 	ld [wNamedObjectIndex], a
 	call GetItemName
@@ -65,7 +65,7 @@ ReceiveBattleItem:
 
 .holding_item
 	; If we are already holding an item, check if we have room in the bag.
-	; If we don't, abort the ability activation.
+	; If we don't, abort the ability.
 	push hl
 	push de
 	push bc
@@ -83,7 +83,7 @@ CheckStickyHold:
 ; Returns nz if opponent Sticky Hold is in effect.
 	call HasOpponentFainted
 	ret z
-	call GetOpponentAbilityAfterMoldBreaker
+	call GetOpponentIgnorableAbility
 	cp STICKY_HOLD
 	jr nz, .no_sticky_hold
 
@@ -92,8 +92,7 @@ CheckStickyHold:
 	and a
 	ret nz
 
-	farcall BeginAbility
-	farcall ShowEnemyAbilityActivation
+	farcall BeginAndShowOpponentAbility
 	ld hl, ItemCantBeStolenText
 	call StdBattleTextbox
 	farcall EndAbility
@@ -116,7 +115,7 @@ CanStealItem:
 	; Sticky Hold prevents item theft unless fainted
 	call HasOpponentFainted
 	jr z, .sticky_hold_done
-	call GetOpponentAbilityAfterMoldBreaker
+	call GetOpponentIgnorableAbility
 	cp STICKY_HOLD
 	jr z, .cant_ability
 

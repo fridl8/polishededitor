@@ -3,9 +3,10 @@
 TrainerGroups:
 ; entries correspond to trainer classes (see constants/trainer_constants.asm)
 	table_width 3
-	dba CarrieGroup
 	dba CalGroup
+	dba CarrieGroup
 	dba JackyGroup
+	dba EunaGroup
 	dba FalknerGroup
 	dba BugsyGroup
 	dba WhitneyGroup
@@ -142,7 +143,7 @@ TrainerGroups:
 	dba ValerieGroup
 	dba KukuiGroup
 	dba PiersGroup
-	dba KatyGroup
+	dba LarryGroup
 	dba VictorGroup
 	dba BillGroup
 	dba YellowGroup
@@ -150,4 +151,5 @@ TrainerGroups:
 	dba ImakuniGroup
 	dba LawrenceGroup
 	dba ReiGroup
+	dba FirebreatherGroup
 	assert_table_length NUM_TRAINER_CLASSES

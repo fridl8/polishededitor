@@ -1466,19 +1466,13 @@ Slots_AskBet:
 
 .Text_BetHowManyCoins:
 	; Bet how many coins?
-	text_far _SlotsBetHowManyCoinsText
-	text_end
-
+	text_farend _SlotsBetHowManyCoinsText
 .Text_Start:
 	; Start!
-	text_far _SlotsStartText
-	text_end
-
+	text_farend _SlotsStartText
 .Text_NotEnoughCoins:
 	; Not enough coins.
-	text_far _SlotsNotEnoughCoinsText
-	text_end
-
+	text_farend _SlotsNotEnoughCoinsText
 .MenuDataHeader:
 	db MENU_BACKUP_TILES
 	menu_coords 14, 10, 19, 17
@@ -1522,13 +1516,9 @@ Slots_AskPlayAgain:
 	ret
 
 .Text_OutOfCoins:
-	text_far _SlotsRanOutOfCoinsText
-	text_end
-
+	text_farend _SlotsRanOutOfCoinsText
 .Text_PlayAgain:
-	text_far _SlotsPlayAgainText
-	text_end
-
+	text_farend _SlotsPlayAgainText
 SlotGetPayout:
 	ld a, [wSlotMatched]
 	cp -1
@@ -1615,14 +1605,10 @@ endr
 
 .Text_LinedUpWonCoins:
 	; lined up! Won @  coins!
-	text_far _SlotsLinedUpText
-	text_end
-
+	text_farend _SlotsLinedUpText
 .Text_Darn:
 	; Darn!
-	text_far _SlotsDarnText
-	text_end
-
+	text_farend _SlotsDarnText
 ; Oddly, the rarest mode (wKeepSevenBiasChance = 1) is the one with
 ; the worse odds to favor seven symbol streaks (12.5% vs 25%).
 ; it's possible that either the wKeepSevenBiasChance initialization
@@ -1894,13 +1880,13 @@ Reel3Tilemap:
 	db SLOTS_CHERRY   ;  2
 
 SlotsTilemapLZ:
-INCBIN "gfx/slots/slots.tilemap.lz"
+INCBIN "gfx/slots/slots.tilemap.lzp"
 
 Slots1LZ:
-INCBIN "gfx/slots/slots_1.2bpp.lz"
+INCBIN "gfx/slots/slots_1.2bpp.lzp"
 
 Slots2LZ:
-INCBIN "gfx/slots/slots_2.2bpp.lz"
+INCBIN "gfx/slots/slots_2.2bpp.lzp"
 
 Slots3LZ:
-INCBIN "gfx/slots/slots_3.2bpp.lz"
+INCBIN "gfx/slots/slots_3.2bpp.lzp"

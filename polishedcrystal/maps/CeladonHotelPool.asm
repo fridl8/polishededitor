@@ -15,6 +15,8 @@ CeladonHotelPool_MapScriptHeader:
 	object_event 10,  3, SPRITE_POKEFAN_M, SPRITEMOVEDATA_STANDING_DOWN, 0, 0, -1, PAL_NPC_BLUE, OBJECTTYPE_COMMAND, jumptextfaceplayer, CeladonHotelPoolPokefanMText, -1
 	object_event  4,  6, SPRITE_CHILD, SPRITEMOVEDATA_WALK_LEFT_RIGHT, 0, 1, -1, PAL_NPC_GREEN, OBJECTTYPE_COMMAND, jumptextfaceplayer, CeladonHotelPoolChildText, -1
 	object_event  5,  3, SPRITE_SWIMMER_GUY, SPRITEMOVEDATA_SWIM_LEFT_RIGHT, 0, 1, -1, PAL_NPC_PURPLE, OBJECTTYPE_SCRIPT, 0, CeladonHotelPoolSwimmerMScript, -1
+	object_event  2,  6, SPRITE_DRAGONITE, SPRITEMOVEDATA_STANDING_UP, 0, 0, -1, PAL_NPC_COPY_BG_YELLOW, OBJECTTYPE_COMMAND, jumptext, CeladonHotelPoolSwimRingText, -1
+	object_event 12,  4, SPRITE_DRAGONITE, SPRITEMOVEDATA_STANDING_UP, 0, 0, -1, PAL_NPC_COPY_BG_RED, OBJECTTYPE_COMMAND, jumptext, CeladonHotelPoolSwimRingText, -1
 
 CeladonHotelPoolSwimmerMScript:
 	checkevent EVENT_GOT_SAFE_GOGGLES_FROM_CELADON
@@ -23,8 +25,7 @@ CeladonHotelPoolSwimmerMScript:
 	opentext
 	writetext .Text1
 	promptbutton
-	verbosegiveitem SAFE_GOGGLES
-	iffalse_endtext
+	verbosegiveitem SAFE_GOGGLES, iffalse_endtext
 	setevent EVENT_GOT_SAFE_GOGGLES_FROM_CELADON
 	jumpthisopenedtext
 
@@ -52,4 +53,8 @@ CeladonHotelPoolPokefanMText:
 
 CeladonHotelPoolChildText:
 	text "Whee!"
+	done
+
+CeladonHotelPoolSwimRingText:
+	text "It's a swim ring."
 	done

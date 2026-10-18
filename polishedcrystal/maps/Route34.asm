@@ -1,5 +1,7 @@
 Route34_MapScriptHeader:
 	def_scene_scripts
+	scene_const SCENE_ROUTE34_NOOP
+	scene_const SCENE_ROUTE34_LYRA_DAYCARE
 
 	def_callbacks
 	callback MAPCALLBACK_OBJECTS, Route34EggCheckCallback
@@ -12,9 +14,9 @@ Route34_MapScriptHeader:
 	warp_event 13, 15, DAYCARE, 3
 
 	def_coord_events
-	coord_event  8, 17, 1, Route34LyraTrigger1
-	coord_event  9, 17, 1, Route34LyraTrigger2
-	coord_event 10, 17, 1, Route34LyraTrigger3
+	coord_event  8, 17, SCENE_ROUTE34_LYRA_DAYCARE, Route34LyraTrigger1
+	coord_event  9, 17, SCENE_ROUTE34_LYRA_DAYCARE, Route34LyraTrigger2
+	coord_event 10, 17, SCENE_ROUTE34_LYRA_DAYCARE, Route34LyraTrigger3
 
 	def_bg_events
 	bg_event 12,  6, BGEVENT_JUMPTEXT, Route34SignText
@@ -103,8 +105,7 @@ Route34LyraTrigger2:
 	applyonemovement PLAYER, step_up
 	pause 10
 	turnobject ROUTE34_LYRA, RIGHT
-	readvar VAR_PLAYERGENDER
-	scalltable Route34LyraIntroductionTable
+	showtext Route34LyraIntroductionText
 	turnobject ROUTE34_LYRA, DOWN
 	pause 10
 	showtext Route34LyraChallengeText
@@ -152,7 +153,7 @@ Route34LyraTrigger2:
 	playsound SFX_EXIT_BUILDING
 	disappear ROUTE34_LYRA
 	applyonemovement PLAYER, step_right
-	setscene $0
+	setscene SCENE_ROUTE34_NOOP
 	pause 15
 	warpcheck
 	warpsound
@@ -383,8 +384,7 @@ TrainerPicnickerGina1:
 
 .LeafStone:
 	callstd giftf
-	verbosegiveitem LEAF_STONE
-	iffalsefwd .BagFull
+	verbosegiveitem LEAF_STONE, iffalsefwd .BagFull
 	clearflag ENGINE_GINA_HAS_LEAF_STONE
 	setevent EVENT_GINA_GAVE_LEAF_STONE
 	jumpstd numberacceptedf
@@ -467,8 +467,7 @@ Route34RichBoyIrvingScript:
 	opentext
 	writetext .AfterText1
 	promptbutton
-	verbosegiveitem BIG_NUGGET
-	iffalse_endtext
+	verbosegiveitem BIG_NUGGET, iffalse_endtext
 	setevent EVENT_GOT_BIG_NUGGET_FROM_ROUTE_34_LEADER
 	jumpthisopenedtext
 
@@ -591,8 +590,7 @@ TrainerCooltrainerfKate:
 	opentext
 	writetext CooltrainerfKateOfferPowerHerbText
 	promptbutton
-	verbosegiveitem POWER_HERB
-	iffalse_endtext
+	verbosegiveitem POWER_HERB, iffalse_endtext
 	setevent EVENT_GOT_POWER_HERB_FROM_KATE
 	jumpthisopenedtext
 
@@ -644,46 +642,13 @@ Route34LyraGreetingText:
 	text "Lyra: Hi, <PLAYER>!"
 	done
 
-Route34LyraIntroductionTable:
-	dw .Male
-	dw .Female
-	dw .Enby
+Route34LyraIntroductionText:
+	text "Grandpa, this is"
+	line "my friend!"
 
-.Male:
-	jumpthistext
-
-	text "This is <PLAYER>."
-	line "He's a trainer."
-
-	para "He's quite good at"
-	line "raising #mon."
-
-	para "Well, not as good"
-	line "as you, of course!"
-	done
-
-.Female:
-	jumpthistext
-
-	text "This is <PLAYER>."
-	line "She's a trainer."
-
-	para "She's quite good at"
-	line "raising #mon."
-
-	para "Well, not as good"
-	line "as you, of course!"
-	done
-
-.Enby:
-	jumpthistext
-
-	text "This is <PLAYER>."
-	line "They're a trainer."
-
-	para "They're quite good"
-	line "at raising #-"
-	cont "mon."
+	para "<PLAYER> is quite"
+	line "good at raising"
+	cont "#mon."
 
 	para "Well, not as good"
 	line "as you, of course!"

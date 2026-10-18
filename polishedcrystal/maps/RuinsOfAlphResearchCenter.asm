@@ -1,37 +1,35 @@
 RuinsOfAlphResearchCenter_MapScriptHeader:
 	def_scene_scripts
-	scene_script RuinsofAlphResearchCenterTrigger0
-	scene_script RuinsofAlphResearchCenterTrigger1
+	scene_script DoNothingScript, SCENE_RUINSOFALPHRESEARCHCENTER_NOOP
+	scene_script RuinsOfAlphResearchCenterGetUnownDexScene, SCENE_RUINSOFALPHRESEARCHCENTER_GET_UNOWN_DEX
 
 	def_callbacks
 	callback MAPCALLBACK_OBJECTS, RuinsOfAlphResearchCenterScientistCallback
 
 	def_warp_events
-	warp_event  2,  7, RUINS_OF_ALPH_OUTSIDE, 6
-	warp_event  3,  7, RUINS_OF_ALPH_OUTSIDE, 6
+	warp_event  4,  7, RUINS_OF_ALPH_OUTSIDE, 7
+	warp_event  5,  7, RUINS_OF_ALPH_OUTSIDE, 7
 
 	def_coord_events
 
 	def_bg_events
-	bg_event  6,  5, BGEVENT_JUMPTEXT, RuinsOfAlphResearchCenterAcademicBooksText
-	bg_event  3,  4, BGEVENT_READ, MapRuinsofAlphResearchCenterSignpost1Script
-	bg_event  7,  1, BGEVENT_JUMPTEXT, RuinsOfAlphResearchCenterPrinterText_DoesntWork
-	bg_event  5,  0, BGEVENT_JUMPTEXT, RuinsOfAlphResearchCenterProfSilktreePhotoText
+	bg_event  8,  5, BGEVENT_JUMPTEXT, RuinsOfAlphResearchCenterAcademicBooksText
+	bg_event  5,  4, BGEVENT_READ, MapRuinsofAlphResearchCenterSignpost1Script
+	bg_event  9,  1, BGEVENT_JUMPTEXT, RuinsOfAlphResearchCenterPrinterText_DoesntWork
+	bg_event  7,  0, BGEVENT_JUMPTEXT, RuinsOfAlphResearchCenterProfSilktreePhotoText
+	bg_event  1,  3, BGEVENT_JUMPTEXT, RuinsOfAlphResearchCenterFossilComputerText
 
 	def_object_events
-	object_event  4,  5, SPRITE_SCIENTIST, SPRITEMOVEDATA_STANDING_UP, 0, 0, -1, PAL_NPC_BROWN, OBJECTTYPE_SCRIPT, 0, RuinsOfAlphResearchCenterScientist1Script, -1
-	object_event  5,  2, SPRITE_SCIENTIST, SPRITEMOVEDATA_WANDER, 1, 2, -1, PAL_NPC_BROWN, OBJECTTYPE_SCRIPT, 0, RuinsOfAlphResearchCenterScientist2Script, -1
-	object_event  2,  5, SPRITE_SCIENTIST, SPRITEMOVEDATA_STANDING_UP, 0, 0, -1, PAL_NPC_BROWN, OBJECTTYPE_SCRIPT, 0, RuinsOfAlphResearchCenterScientist3Script, EVENT_RUINS_OF_ALPH_RESEARCH_CENTER_SCIENTIST
+	object_event  6,  5, SPRITE_SCIENTIST, SPRITEMOVEDATA_STANDING_UP, 0, 0, -1, PAL_NPC_BROWN, OBJECTTYPE_SCRIPT, 0, RuinsOfAlphResearchCenterScientist1Script, -1
+	object_event  7,  2, SPRITE_SCIENTIST, SPRITEMOVEDATA_WANDER, 1, 2, -1, PAL_NPC_BROWN, OBJECTTYPE_SCRIPT, 0, RuinsOfAlphResearchCenterScientist2Script, -1
+	object_event  4,  5, SPRITE_SCIENTIST, SPRITEMOVEDATA_STANDING_UP, 0, 0, -1, PAL_NPC_BROWN, OBJECTTYPE_SCRIPT, 0, RuinsOfAlphResearchCenterScientist3Script, EVENT_RUINS_OF_ALPH_RESEARCH_CENTER_SCIENTIST
+	object_event  0,  4, SPRITE_SCIENTIST, SPRITEMOVEDATA_STANDING_UP, 0, 0, -1, PAL_NPC_BROWN, OBJECTTYPE_SCRIPT, 0, RuinsOfAlphResearchCenterScientist4Script, -1
 
 	object_const_def
 	const RUINSOFALPHRESEARCHCENTER_SCIENTIST1
 	const RUINSOFALPHRESEARCHCENTER_SCIENTIST2
 	const RUINSOFALPHRESEARCHCENTER_SCIENTIST3
-
-RuinsofAlphResearchCenterTrigger1:
-	sdefer RuinsOfAlphResearchCenterGetUnownDexScript
-RuinsofAlphResearchCenterTrigger0:
-	end
+	const RUINSOFALPHRESEARCHCENTER_SCIENTIST4
 
 RuinsOfAlphResearchCenterScientistCallback:
 	checkscene
@@ -39,11 +37,15 @@ RuinsOfAlphResearchCenterScientistCallback:
 	endcallback
 
 .ShowScientist:
-	moveobject RUINSOFALPHRESEARCHCENTER_SCIENTIST3, 3, 7
+	moveobject RUINSOFALPHRESEARCHCENTER_SCIENTIST3, 5, 7
 	appear RUINSOFALPHRESEARCHCENTER_SCIENTIST3
 	endcallback
 
-RuinsOfAlphResearchCenterGetUnownDexScript:
+RuinsOfAlphResearchCenterGetUnownDexScene:
+	sdefer .Script
+	end
+
+.Script:
 	applymovement RUINSOFALPHRESEARCHCENTER_SCIENTIST3, RuinsOfAlphResearchCenterApproachesComputerMovement
 	playsound SFX_BOOT_PC
 	pause 60
@@ -65,7 +67,7 @@ RuinsOfAlphResearchCenterGetUnownDexScript:
 	waitbutton
 	closetext
 	applyonemovement RUINSOFALPHRESEARCHCENTER_SCIENTIST3, step_up
-	setscene $0
+	setscene SCENE_RUINSOFALPHRESEARCHCENTER_NOOP
 	special RestartMapMusic
 	end
 
@@ -79,7 +81,18 @@ RuinsOfAlphResearchCenterScientist3Script:
 	jumpopenedtext RuinsOfAlphResearchCenterScientist3Text
 
 .Conclusion:
-	jumpopenedtext RuinsofAlphResearchCenterScientistConclusionText
+	jumpthisopenedtext
+
+	text "We're going to"
+	line "gradually study"
+
+	para "the chamber that"
+	line "opened up."
+
+	para "We have to take"
+	line "care not to"
+	cont "disturb the site."
+	done
 
 .PrinterAvailable:
 	writetext RuinsOfAlphResearchCenterScientist3_PrinterAvailable
@@ -101,10 +114,15 @@ RuinsOfAlphResearchCenterScientist3Script:
 	earthquake 60
 	waitsfx
 	setevent EVENT_DOOR_OPENED_IN_RUINS_OF_ALPH
+	turnobject PLAYER, DOWN
+	turnobject RUINSOFALPHRESEARCHCENTER_SCIENTIST1, DOWN
+	turnobject RUINSOFALPHRESEARCHCENTER_SCIENTIST2, DOWN
+	turnobject RUINSOFALPHRESEARCHCENTER_SCIENTIST3, DOWN
+	turnobject RUINSOFALPHRESEARCHCENTER_SCIENTIST4, DOWN
 	showemote EMOTE_SHOCK, PLAYER, 15
 	showemote EMOTE_SHOCK, RUINSOFALPHRESEARCHCENTER_SCIENTIST3, 15
-	showemote EMOTE_SHOCK, RUINSOFALPHRESEARCHCENTER_SCIENTIST1, 15
-	showemote EMOTE_SHOCK, RUINSOFALPHRESEARCHCENTER_SCIENTIST2, 15
+	faceobject PLAYER, RUINSOFALPHRESEARCHCENTER_SCIENTIST3
+	faceobject RUINSOFALPHRESEARCHCENTER_SCIENTIST3, PLAYER
 	showtext RuinsofAlphResearchCenterScientistShockedText
 	readvar VAR_FACING
 	ifequalfwd UP, .GoAround
@@ -151,13 +169,37 @@ RuinsOfAlphResearchCenterScientist1Script:
 	iftruefwd .GotUnownDex
 	checkevent EVENT_MADE_UNOWN_APPEAR_IN_RUINS
 	iftruefwd .UnownAppeared
-	jumpopenedtext RuinsOfAlphResearchCenterScientist1Text
+	jumpthisopenedtext
+
+	text "The ruins are"
+	line "about 1,500 years"
+	cont "old."
+
+	para "But it's not known"
+	line "why they were"
+	cont "built--or by whom."
+	done
 
 .UnownAppeared:
-	jumpopenedtext RuinsOfAlphResearchCenterScientist1Text_UnownAppeared
+	jumpthisopenedtext
+
+	text "#mon appeared"
+	line "in the ruins?"
+
+	para "That's incredible"
+	line "news!"
+
+	para "We'll need to"
+	line "investigate this."
+	done
 
 .GotUnownDex:
-	jumpopenedtext RuinsOfAlphResearchCenterScientist1Text_GotUnownDex
+	jumpthisopenedtext
+
+	text "I wonder how many"
+	line "kinds of #mon"
+	cont "are in the ruins?"
+	done
 
 .GotAllUnown:
 	writetext RuinsOfAlphResearchCenterScientist1Text_GotAllUnown
@@ -173,17 +215,56 @@ RuinsOfAlphResearchCenterScientist2Script:
 	ifgreater 3, .GotAllUnown
 	checkevent EVENT_MADE_UNOWN_APPEAR_IN_RUINS
 	iftruefwd .UnownAppeared
-	jumpopenedtext RuinsOfAlphResearchCenterScientist2Text
+	jumpthisopenedtext
+
+	text "There are odd pat-"
+	line "terns drawn on the"
+
+	para "walls of the"
+	line "ruins."
+
+	para "They must be the"
+	line "keys for unravel-"
+	cont "ing the mystery"
+	cont "of the ruins."
+	done
 
 .UnownAppeared:
-	jumpopenedtext RuinsOfAlphResearchCenterScientist2Text_UnownAppeared
+	jumpthisopenedtext
+
+	text "The strange #-"
+	line "mon you saw in the"
+	cont "ruins?"
+
+	para "They appear to be"
+	line "very much like the"
+
+	para "drawings on the"
+	line "walls there."
+
+	para "Hmm…"
+
+	para "That must mean"
+	line "there are many"
+	cont "kinds of them…"
+	done
 
 .GotAllUnown:
 	readvar VAR_UNOWNCOUNT
 	ifequalfwd NUM_UNOWN, .ResearchComplete
 	readvar VAR_UNOWNCOUNT
 	ifgreater 10, .ResearchOngoing
-	jumpopenedtext RuinsOfAlphResearchCenterScientist2Text_GotAllUnown
+	jumpthisopenedtext
+
+	text "Why did those"
+	line "ancient patterns"
+
+	para "appear on the wall"
+	line "now?"
+
+	para "The mystery"
+	line "deepens…"
+	done
 
 .ResearchComplete:
 	writetext RuinsOfAlphResearchCenterScientist2Text_RadioWaves
@@ -193,7 +274,97 @@ RuinsOfAlphResearchCenterScientist2Script:
 	end
 
 .ResearchOngoing:
-	jumpopenedtext RuinsOfAlphResearchCenterScientist2Text_FocusedOurStudies
+	jumpthisopenedtext
+
+	text "We think something"
+	line "caused the cryptic"
+
+	para "patterns to appear"
+	line "in the ruins."
+
+	para "We've focused our"
+	line "studies on that."
+	done
+
+RuinsOfAlphResearchCenterScientist4Script:
+	checkevent EVENT_RUINS_OF_ALPH_CLIMAX_DONE
+	iftruefwd .CanResurrectFossils
+	checkflag ENGINE_UNOWN_DEX
+	iffalse_jumptextfaceplayer .TooBusyText
+	jumpthistextfaceplayer
+
+	text "You're investigat-"
+	line "ing the Unown too?"
+
+	para "Maybe with your"
+	line "help, I'll have"
+
+	para "time to finish my"
+	line "research on the"
+
+	para "#mon fossils"
+	line "around here."
+	done
+
+.CanResurrectFossils
+	faceplayer
+	opentext
+	checkevent EVENT_CAN_RESURRECT_FOSSILS_IN_RUINS_OF_ALPH
+	iftruefwd .SkipIntro
+	writetext .IntroText
+	waitbutton
+	setevent EVENT_CAN_RESURRECT_FOSSILS_IN_RUINS_OF_ALPH
+.SkipIntro
+	writetext .QuestionText
+	waitbutton
+	loadmem wResurrectFossilScriptBank, BANK(.FaceUp)
+	loadmem wResurrectFossilScript+0, LOW(.FaceUp)
+	loadmem wResurrectFossilScript+1, HIGH(.FaceUp)
+	farsjump AskResurrectFossilScript
+
+.FaceUp:
+	turnobject RUINSOFALPHRESEARCHCENTER_SCIENTIST4, UP
+	end
+
+.TooBusyText:
+	text "We sometimes find"
+	line "fossils in the"
+
+	para "rocks that we"
+	line "excavate here."
+
+	para "I'm eager to study"
+	line "them… but so far,"
+
+	para "understanding the"
+	line "ruins has kept me"
+	cont "too busy."
+	done
+
+.IntroText:
+	text "You're the kid who"
+	line "figured out the"
+	cont "Unown's secrets!"
+
+	para "Thanks to you,"
+	line "I've had time to"
+
+	para "study my passion"
+	line "of fossils."
+
+	para "I found a way to"
+	line "extract living"
+	cont "#mon from them!"
+	done
+
+.QuestionText:
+	text "If you find a"
+	line "fossil in some"
+	cont "rock, bring it"
+
+	para "here and I'll re-"
+	line "vive it for you."
+	done
 
 MapRuinsofAlphResearchCenterSignpost1Script:
 	opentext
@@ -201,7 +372,13 @@ MapRuinsofAlphResearchCenterSignpost1Script:
 	iffalsefwd .SkipChecking
 	checkevent EVENT_DECO_UNOWN_DOLL
 	iftruefwd .SkipChecking
-	jumpopenedtext RuinsOfAlphResearchCenterComputerText
+	jumpthisopenedtext
+
+	text "Ruins of Alph"
+
+	para "Exploration"
+	line "Year 10"
+	done
 
 .SkipChecking:
 	readvar VAR_UNOWNCOUNT
@@ -290,45 +467,6 @@ RuinsofAlphResearchCenterScientistShockedText:
 	text "What was THAT?!"
 	done
 
-RuinsofAlphResearchCenterScientistConclusionText:
-	text "We're going to"
-	line "gradually study"
-
-	para "the chamber that"
-	line "opened up."
-
-	para "We have to take"
-	line "care not to"
-	cont "disturb the site."
-	done
-
-RuinsOfAlphResearchCenterScientist1Text:
-	text "The ruins are"
-	line "about 1,500 years"
-	cont "old."
-
-	para "But it's not known"
-	line "why they were"
-	cont "built--or by whom."
-	done
-
-RuinsOfAlphResearchCenterScientist1Text_GotUnownDex:
-	text "I wonder how many"
-	line "kinds of #mon"
-	cont "are in the ruins?"
-	done
-
-RuinsOfAlphResearchCenterScientist1Text_UnownAppeared:
-	text "#mon appeared"
-	line "in the ruins?"
-
-	para "That's incredible"
-	line "news!"
-
-	para "We'll need to"
-	line "investigate this."
-	done
-
 RuinsOfAlphResearchCenterScientist1Text_GotAllUnown:
 	text "Our investigation,"
 	line "with your help, is"
@@ -341,48 +479,6 @@ RuinsOfAlphResearchCenterScientist1Text_GotAllUnown:
 
 	para "as a habitat for"
 	line "#mon."
-	done
-
-RuinsOfAlphResearchCenterScientist2Text:
-	text "There are odd pat-"
-	line "terns drawn on the"
-
-	para "walls of the"
-	line "ruins."
-
-	para "They must be the"
-	line "keys for unravel-"
-	cont "ing the mystery"
-	cont "of the ruins."
-	done
-
-RuinsOfAlphResearchCenterScientist2Text_UnownAppeared:
-	text "The strange #-"
-	line "mon you saw in the"
-	cont "ruins?"
-
-	para "They appear to be"
-	line "very much like the"
-
-	para "drawings on the"
-	line "walls there."
-
-	para "Hmm…"
-
-	para "That must mean"
-	line "there are many"
-	cont "kinds of them…"
-	done
-
-RuinsOfAlphResearchCenterScientist2Text_FocusedOurStudies:
-	text "We think something"
-	line "caused the cryptic"
-
-	para "patterns to appear"
-	line "in the ruins."
-
-	para "We've focused our"
-	line "studies on that."
 	done
 
 RuinsOfAlphResearchCenterScientist2Text_RadioWaves:
@@ -400,24 +496,6 @@ RuinsOfAlphResearchCenterScientist2Text_RadioWaves:
 
 	para "some sort of a"
 	line "link…"
-	done
-
-RuinsOfAlphResearchCenterScientist2Text_GotAllUnown:
-	text "Why did those"
-	line "ancient patterns"
-
-	para "appear on the wall"
-	line "now?"
-
-	para "The mystery"
-	line "deepens…"
-	done
-
-RuinsOfAlphResearchCenterComputerText:
-	text "Ruins of Alph"
-
-	para "Exploration"
-	line "Year 10"
 	done
 
 RuinsOfAlphResearchCenterComputerText_GotAllUnown:
@@ -444,6 +522,14 @@ RuinsOfAlphResearchCenterProfSilktreePhotoText:
 
 	para "Center's founder,"
 	line "Prof.Silktree."
+	done
+
+RuinsOfAlphResearchCenterFossilComputerText:
+	text "“Resurrecting"
+	line "the Past”…"
+
+	para "It's a paper on"
+	line "#mon fossils."
 	done
 
 RuinsOfAlphResearchCenterAcademicBooksText:

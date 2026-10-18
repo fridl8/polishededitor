@@ -53,38 +53,25 @@ WonderTrade::
 	call PrintText
 
 	call DisableSpriteUpdates
-	predef TradeAnimation
+	farcall TradeAnimation
 
 	jmp ReturnToMapWithSpeechTextbox
 
 .Text_WonderTradeQuestion:
-	text_far WonderTradeQuestionText
-	text_end
-
+	text_farend WonderTradeQuestionText
 .Text_WonderTradePrompt:
-	text_far WonderTradePromptText
-	text_end
-
+	text_farend WonderTradePromptText
 .Text_WonderTradeCantTradeSpikyEaredPichu
-	text_far WonderTradeCantTradeSpikyEaredPichuText
-	text_end
-
+	text_farend WonderTradeCantTradeSpikyEaredPichuText
 ;.Text_WonderTradeCantTradeEgg:
-;	text_far WonderTradeCantTradeEggText
-;	text_end
+;	text_farend WonderTradeCantTradeEggText
 
 .Text_WonderTradeConfirm:
-	text_far WonderTradeConfirmText
-	text_end
-
+	text_farend WonderTradeConfirmText
 .Text_WonderTradeSetup:
-	text_far WonderTradeSetupText
-	text_end
-
+	text_farend WonderTradeSetupText
 .Text_WonderTradeReady:
-	text_far WonderTradeReadyText
-	text_end
-
+	text_farend WonderTradeReadyText
 DoWonderTrade:
 	ld a, 1
 	ldh [hScriptVar], a
@@ -186,9 +173,12 @@ DoWonderTrade:
 	ld de, wPlayerTrademonPersonality
 	call Trade_CopyTwoBytes
 
-	xor a
-	ld [wPlayerTrademonCaughtData], a
-	ld [wOTTrademonCaughtData], a
+	ld hl, wPartyMon1CaughtBall
+	ld bc, PARTYMON_STRUCT_LENGTH
+	call Trade_GetAttributeOfCurrentPartymon
+	ld a, [hl]
+	and CAUGHT_BALL_MASK
+	ld [wPlayerTrademonCaughtBall], a
 
 	ld hl, wPartyMon1Level
 	ld bc, PARTYMON_STRUCT_LENGTH
@@ -200,13 +190,13 @@ DoWonderTrade:
 	xor a
 	ld [wMonType], a
 	ld [wPokemonWithdrawDepositParameter], a
-	predef RemoveMonFromParty
+	farcall RemoveMonFromParty
 
 	call GetWonderTradeOTForm
 	ld a, d
 	ld [wCurForm], a
 	ld [wOTTrademonForm], a
-	predef TryAddMonToParty
+	farcall TryAddMonToParty
 
 	ld a, [wOTTrademonSpecies]
 	ld c, a
@@ -223,10 +213,10 @@ DoWonderTrade:
 	call CopyTradeName
 
 	call Random
-	ld [wBuffer1], a
+	ld [wWonderTradeScratch], a
 	call Random
-	ld [wBuffer1 + 1], a
-	ld hl, wBuffer1
+	ld [wWonderTradeScratch + 1], a
+	ld hl, wWonderTradeScratch
 	ld de, wOTTrademonID
 	call Trade_CopyTwoBytes
 
@@ -267,17 +257,18 @@ DoWonderTrade:
 .poke_ball
 	ld a, POKE_BALL
 .got_ball
+	ld [wOTTrademonCaughtBall], a
 	ld c, a
 	farcall SetGiftPartyMonCaughtData
 
 	; Random DVs
 	call Random
-	ld [wBuffer1], a
+	ld [wWonderTradeScratch], a
 	call Random
-	ld [wBuffer1 + 1], a
+	ld [wWonderTradeScratch + 1], a
 	call Random
-	ld [wBuffer1 + 2], a
-	ld hl, wBuffer1
+	ld [wWonderTradeScratch + 2], a
+	ld hl, wWonderTradeScratch
 	ld de, wOTTrademonDVs
 	call Trade_CopyThreeBytes
 
@@ -312,7 +303,7 @@ endr
 	ld b, a
 .not_shiny
 	ld a, b
-	ld [wBuffer1], a
+	ld [wWonderTradeScratch], a
 	; Random gender (50-50)
 	call Random
 	and GENDER_MASK
@@ -337,8 +328,8 @@ endr
 	; Form
 	ld a, [wCurForm]
 	add b
-	ld [wBuffer1 + 1], a
-	ld hl, wBuffer1
+	ld [wWonderTradeScratch + 1], a
+	ld hl, wWonderTradeScratch
 	ld de, wOTTrademonPersonality
 	call Trade_CopyTwoBytes
 
@@ -430,10 +421,6 @@ GetGSBallPichu:
 	ld de, wPlayerTrademonPersonality
 	call Trade_CopyTwoBytes
 
-	xor a
-	ld [wPlayerTrademonCaughtData], a
-	ld [wOTTrademonCaughtData], a
-
 	ld hl, wPartyMon1Level
 	ld bc, PARTYMON_STRUCT_LENGTH
 	call Trade_GetAttributeOfCurrentPartymon
@@ -442,10 +429,12 @@ GetGSBallPichu:
 	xor a
 	ld [wMonType], a
 	ld [wPokemonWithdrawDepositParameter], a
-	predef RemoveMonFromParty
-	predef TryAddMonToParty
+	farcall RemoveMonFromParty
+	farcall TryAddMonToParty
 
-	ld c, ULTRA_BALL
+	ld a, ULTRA_BALL
+	ld [wOTTrademonCaughtBall], a
+	ld c, a
 	farcall SetGiftPartyMonCaughtData
 
 	ld a, [wOTTrademonSpecies]
@@ -524,7 +513,7 @@ GetWonderTradeOTName:
 	jr z, .ok
 	ld hl, WonderTradeOTNames2
 .ok
-	lb bc, 0, PLAYER_NAME_LENGTH
+	lb bc, 0, PLAYER_NAME_LENGTH - 1
 	rst AddNTimes
 	ret
 

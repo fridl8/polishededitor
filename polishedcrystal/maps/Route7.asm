@@ -10,7 +10,7 @@ Route7_MapScriptHeader:
 	def_coord_events
 
 	def_bg_events
-	bg_event  5, 13, BGEVENT_JUMPTEXT, Route7UndergroundPathSignText
+	bg_event  4, 12, BGEVENT_JUMPTEXT, Route7UndergroundPathSignText
 	bg_event  6, 11, BGEVENT_JUMPTEXT, Route7LockedDoorText
 
 	def_object_events
@@ -49,7 +49,11 @@ Route7Snorlax:
 	opentext
 	special SpecialSnorlaxAwake
 	iftruefwd .Awake
-	jumpopenedtext .AsleepText
+	jumpthisopenedtext
+
+	text "Snorlax is snoring"
+	line "peacefully…"
+	done
 
 .Awake:
 	writetext .AwakeText
@@ -64,10 +68,6 @@ Route7Snorlax:
 	reloadmapafterbattle
 	end
 
-.AsleepText:
-	text "Snorlax is snoring"
-	line "peacefully…"
-	done
 
 .AwakeText:
 	text "The #gear was"

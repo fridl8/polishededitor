@@ -137,7 +137,7 @@ ItemDescriptions:
 	dw NeverMeltIceDesc
 	dw DragonFangDesc
 	dw BlackGlassesDesc
-	dw PinkBowDesc
+	dw FairyFeatherDesc
 	dw BerserkGeneDesc
 	dw BrightPowderDesc
 	dw QuickClawDesc
@@ -296,6 +296,7 @@ KeyItemDescriptions:
 	dw ShinyCharmDesc
 	dw OvalCharmDesc
 	dw CatchCharmDesc
+	dw DexNavDesc
 	assert_table_length NUM_KEY_ITEMS
 
 ExpCandyDescriptions:
@@ -943,7 +944,7 @@ BlackGlassesDesc:
 	next "type moves. (Hold)"
 	done
 
-PinkBowDesc:
+FairyFeatherDesc:
 	text "Powers up Fairy-"
 	next "type moves. (Hold)"
 	done
@@ -1679,6 +1680,11 @@ OvalCharmDesc:
 CatchCharmDesc:
 	text "A charm for catch-"
 	next "ing #mon."
+	done
+
+DexNavDesc:
+	text "Searches for wild"
+	next "#mon nearby."
 	done
 
 SilphScope2Desc:

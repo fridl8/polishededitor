@@ -4,8 +4,8 @@ Route26HealSpeechHouse_MapScriptHeader:
 	def_callbacks
 
 	def_warp_events
-	warp_event  2,  7, ROUTE_26, 2
-	warp_event  3,  7, ROUTE_26, 2
+	warp_event  2,  7, ROUTE_26, 3
+	warp_event  3,  7, ROUTE_26, 3
 
 	def_coord_events
 
@@ -24,7 +24,15 @@ Route26HealHouseTeacherScript:
 	pause 60
 	special Special_FadeInQuickly
 	special RestartMapMusic
-	jumptext Route26HealHouseKeepAtItText
+	jumpthistext
+
+	text "There!"
+
+	para "Your #mon are"
+	line "looking good!"
+
+	para "Keep at it!"
+	done
 
 Route26HealHouseRestAWhileText:
 	text "Your #mon look"
@@ -32,13 +40,4 @@ Route26HealHouseRestAWhileText:
 
 	para "You should rest"
 	line "them a while."
-	done
-
-Route26HealHouseKeepAtItText:
-	text "There!"
-
-	para "Your #mon are"
-	line "looking good!"
-
-	para "Keep at it!"
 	done

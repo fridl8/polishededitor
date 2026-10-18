@@ -4,7 +4,9 @@ hScriptVar:: dw
 
 hROMBank:: db
 hROMBankBackup:: db
-	ds 1 ; unused
+
+hScriptBank:: db
+hScriptPos:: dw
 
 hHours:: db
 hMinutes:: db
@@ -45,11 +47,7 @@ ENDU
 
 hPrinter:: db
 
-	ds 2 ; unused
-
-UNION
 ; math-related values
-
 UNION
 ; inputs to Multiply
 	ds 1
@@ -67,13 +65,20 @@ NEXTU
 	ds 1
 hQuotient::     ds 3
 hRemainder::    db
-ENDU
-
-hMathBuffer:: ds 5
-
 NEXTU
 ; PrintNum scratch space
 hPrintNum:: ds 5
+ENDU
+
+UNION
+hMathBuffer:: ds 5
+NEXTU
+; FacingPlayerDistance scratch space
+hLineOfSightXLo:: db
+hLineOfSightXHi:: db
+hLineOfSightYLo:: db
+hLineOfSightYHi:: db
+hTrainerSeeing::  db
 ENDU
 
 UNION
@@ -109,20 +114,13 @@ hSCY:: db
 hWX::  db
 hWY::  db
 
-hTilesPerCycle::
-; 0 - no update
-; 1 - vBGMap0 tiles
-; 2 - vBGMap0 attributes
-; 3 - vBGMap0 tiles
-; 4 - vBGMap0 attributes
+hBGMapCopyNRows:: ; How many rows the `_OFS` modes (in hBGMapMode) ought to copy
+hNbRowsToCopy::   ; Temporary counter for `CopyTilemapInHBlank`
+hNbTilesToCopy::  ; Temporary counter for the `gfx.asm` functions
 	db
-hBGMapMode::
-; 0 - top third
-; 1 - middle third
-; 2 - bottom third
-	db
-hBGMapHalf::     db
-hBGMapAddress::  dw
+hBGMapMode::    db ; See `ram_constants.asm`
+hBGMapHalf::    db ; Either 0 (top half), or 1 (bottom half)
+hBGMapAddress:: dw
 
 hBGMapUpdate::    db
 hBGMapTileCount:: db
@@ -146,8 +144,6 @@ hSerialIgnoringInitialData:: db
 hSerialSend::                db
 hSerialReceive::             db
 
-hSPBuffer:: dw
-
 UNION
 ; 0 - player
 ; 1 - opponent trainer
@@ -155,13 +151,14 @@ hBattleTurn:: db
 hBattlePalFadeMode:: db
 hTimeOfDayPalOffset:: db
 NEXTU
-hChartScreen:: db
+hChartScreen:: db ; $00 = EVs, $FF = IVs
 hChartFillCoord:: db
 hChartLineCoord:: db
 NEXTU
 hPokedexAreaMode:: ; %xyyyzzzz, x: area unknown, y: region, z: location type
 hPokedexStatsCurAbil:: db
-	ds 2
+hPokedexROMBankBackup:: db
+	ds 1
 ENDU
 
 hCGBPalUpdate:: db
@@ -173,9 +170,6 @@ hDelayFrameLY:: db
 
 hClockResetTrigger:: db
 
-hMPState::  db
-hMPBuffer:: db
-
 hRequested2bpp::        db
 hRequested1bpp::        db
 hRequestedVTileDest::   dw
@@ -183,13 +177,19 @@ hRequestedVTileSource:: dw
 hRequestOpaque1bpp::    db
 
 UNION
+; PrintMagikarpLength
 hTmpd:: db
 hTmpe:: db
 	ds 1
 NEXTU
+; Judge Machine
 hDX::  db
 hDY::  db
 hErr:: db
+NEXTU
+; Music Player
+hMPState::  db
+hNextMPState:: db
 ENDU
 
 hCrashCode:: db
@@ -205,25 +205,41 @@ hPlaceStringCoords:: dw
 hCompressedTextBuffer:: ds 2 ; one character and "@"
 ENDU
 
-hScriptBank:: db
-hScriptPos:: dw
-
 hUsedWeatherSpriteIndex:: db
 hUsedOAMIndex:: db
 
-	ds 7 ; unused
+hOverworldMapAnchor:: dw
+hMetatileStandingY:: db
+hMetatileStandingX:: db
+hPlayerStepDirection:: db
+hStreamMapWalkedPatch:: db ; Step renderer scratch.
+
+
+SECTION "HRAM tail", HRAM
 
 hLCDInterruptFunction::
-hFunctionJump::     db ; $c3 jp
-hFunctionTarget::
-hFunctionTargetLo:: db ; LOW(target)
-hFunctionTargetHi:: db ; HIGH(target)
+hLCDInterruptFunctionJump::     db ; $c3 jp
+hLCDInterruptFunctionTarget::
+hLCDInterruptFunctionTargetLo:: db ; LOW(target)
+hLCDInterruptFunctionTargetHi:: db ; HIGH(target)
 
-hBitwiseOperation::
-hBitwisePrefix:: db ; $cb prefix
-hBitwiseOpcode:: db ; opcode
-hBitwiseRet::    db ; $c9 ret
+; functions used by Judge Machine
 
-hSingleOperation::
-hSingleOpcode:: db ; opcode
-hSingleRet::    db ; $c9 ret
+hBitwiseFunction:: ; also used by ObjectFlags1Step
+hBitwiseFunctionPrefix:: db ; $cb prefix
+hBitwiseFunctionOpcode:: db ; opcode
+hBitwiseFunctionRet::    db ; $c9 ret
+
+hSingleFunction::
+hSingleFunctionOpcode:: db ; opcode
+hSingleFunctionRet::    db ; $c9 ret
+
+hJumpFunction::
+hJumpFunctionJump::     db ; $c3 jp
+hJumpFunctionTarget::
+hJumpFunctionTargetLo:: db ; LOW(target)
+hJumpFunctionTargetHi:: db ; HIGH(target)
+
+; The variables above need to be within `jr` range of some code in early ROM0, so we place them
+; at the very end of HRAM to help with that.
+	align 16, $ffff

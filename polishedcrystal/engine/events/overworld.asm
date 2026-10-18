@@ -1,14 +1,14 @@
 FieldMoveJumptableReset:
 	xor a
-	ld hl, wBuffer1
+	ld hl, wFieldMoveJumptableIndex
 	ld bc, 7
 	rst ByteFill
 	ret
 
 FieldMoveJumptable:
-	ld a, [wBuffer1]
+	ld a, [wFieldMoveJumptableIndex]
 	call JumpTable
-	ld [wBuffer1], a
+	ld [wFieldMoveJumptableIndex], a
 	bit 7, a
 	jr nz, .okay
 	and a
@@ -59,9 +59,7 @@ CheckBadge:
 .BadgeRequiredText:
 	; Sorry! A new BADGE
 	; is required.
-	text_far _BadgeRequiredText
-	text_end
-
+	text_farend _BadgeRequiredText
 CheckPartyMove:
 ; Check if a monster in your party has move d, or
 ; can have move d and you have TM/HM e.
@@ -120,7 +118,7 @@ CheckPartyMove:
 	add hl, bc
 	ld a, [hl]
 	ld [wCurPartySpecies], a
-	predef CanLearnTMHMMove
+	farcall CanLearnTMHMMove
 	ld a, c
 	and a
 	jr nz, .yes
@@ -176,9 +174,7 @@ FieldMoveFailed:
 
 .CantUseHere:
 	; Can't use that here.
-	text_far _CantUseItemText
-	text_end
-
+	text_farend _CantUseItemText
 CutFunction:
 	call FieldMoveJumptableReset
 .loop
@@ -226,9 +222,7 @@ CutFunction:
 
 Text_NothingToCut:
 	; There's nothing to CUT here.
-	text_far _CutNothingText
-	text_end
-
+	text_farend _CutNothingText
 CheckMapForSomethingToCut:
 	call GetFacingObject
 	jr c, .no_tree
@@ -252,23 +246,23 @@ CheckMapForSomethingToCut:
 	call CheckOverworldTileArrays
 	pop hl
 	jr nc, .fail
-	; Back up the wOverworldMapBlocks address to wBuffer3
+	; Back up the wOverworldMapBlocks address to wCutWhirlpoolOverworldBlockAddr
 	ld a, l
-	ld [wBuffer3], a
+	ld [wCutWhirlpoolOverworldBlockAddr], a
 	ld a, h
-	ld [wBuffer4], a
-	; Back up the replacement tile to wBuffer5
+	ld [wCutWhirlpoolOverworldBlockAddr + 1], a
+	; Back up the replacement tile to wCutWhirlpoolReplacementBlock
 	ld a, b
-	ld [wBuffer5], a
-	; Back up the animation index to wBuffer6
+	ld [wCutWhirlpoolReplacementBlock], a
+	; Back up the animation index to wCutWhirlpoolAnimationType
 	ld a, $1
-	ld [wBuffer6], a
+	ld [wCutWhirlpoolAnimationType], a
 	xor a
 	ret
 
 .tree
 	xor a
-	ld [wBuffer6], a
+	ld [wCutWhirlpoolAnimationType], a
 	ret
 
 .fail
@@ -278,7 +272,7 @@ CheckMapForSomethingToCut:
 Script_CutFromMenu:
 	refreshmap
 	special UpdateTimePals
-	callasm GetBuffer6
+	callasm GetCutWhirlpoolAnimationType
 	ifequal $0, Script_CutTree
 ;Script_CutGrass:
 	callasm PrepareOverworldMove
@@ -288,8 +282,8 @@ Script_CutFromMenu:
 	callasm CutDownGrass
 	endtext
 
-GetBuffer6:
-	ld a, [wBuffer6]
+GetCutWhirlpoolAnimationType:
+	ld a, [wCutWhirlpoolAnimationType]
 	ldh [hScriptVar], a
 	ret
 
@@ -298,13 +292,14 @@ CutDownGrass:
 	set OW_WEATHER_LIGHTNING_DISABLED_F, [hl]
 	farcall CancelOWFadePalettes
 	farcall CopyBGGreenToOBPal7
-	ld hl, wBuffer3 ; OverworldMapTile
+	ld hl, wCutWhirlpoolOverworldBlockAddr ; OverworldMapTile
 	ld a, [hli]
 	ld h, [hl]
 	ld l, a
-	ld a, [wBuffer5] ; ReplacementTile
+	ld a, [wCutWhirlpoolReplacementBlock] ; ReplacementTile
 	ld [hl], a
 	xor a
+	assert NO_BG_MAP_TRANSFER == 0
 	ldh [hBGMapMode], a
 	call LoadMapPart
 	call UpdateSprites
@@ -376,6 +371,7 @@ CutDownTree:
 	farcall CancelOWFadePalettes
 	farcall CopyBGGreenToOBPal7
 	xor a
+	assert NO_BG_MAP_TRANSFER == 0
 	ldh [hBGMapMode], a
 	call LoadMapPart
 	call UpdateSprites
@@ -514,7 +510,7 @@ SurfFunction:
 
 .DoSurf:
 	call GetSurfType
-	ld [wBuffer2], a
+	ld [wSurfingPlayerState], a
 	call GetPartyNickname
 	ld hl, SurfFromMenuScript
 	call QueueScript
@@ -546,7 +542,7 @@ UsedSurfScript:
 	scall FieldMovePokepicScript
 
 AutoSurfScript:
-	readmem wBuffer2
+	readmem wSurfingPlayerState
 	writevar VAR_MOVEMENT
 
 	special UpdatePlayerSprite
@@ -557,13 +553,9 @@ AutoSurfScript:
 	end
 
 CantSurfText:
-	text_far _CantSurfText
-	text_end
-
+	text_farend _CantSurfText
 AlreadySurfingText:
-	text_far _AlreadySurfingText
-	text_end
-
+	text_farend _AlreadySurfingText
 GetSurfType:
 ; Surfing on Pikachu uses an alternate sprite.
 ; This is done by using a separate movement type.
@@ -648,7 +640,7 @@ TrySurfOW::
 	jr nz, .quit
 
 	call GetSurfType
-	ld [wBuffer2], a
+	ld [wSurfingPlayerState], a
 	call GetPartyNickname
 
 	ld a, BANK(AskSurfScript)
@@ -682,8 +674,8 @@ CheckFlyAllowedOnMap:
 	jr z, .no_fly
 .not_orange
 	call GetMapEnvironment
-	call CheckOutdoorMap
-	ret z
+	cp LAST_OUTDOOR_ENV + 1
+	jr c, .yes_fly
 	ld a, [wMapGroup]
 	ld d, a
 	ld a, [wMapNumber]
@@ -694,17 +686,15 @@ CheckFlyAllowedOnMap:
 	and a
 	jr z, .no_fly
 	cp d
-	jr nz, .skip
 	ld a, [hli]
+	jr nz, .loop
 	cp e
-	ret z
-	jr .loop
-.skip
-	inc hl
-	jr .loop
+	jr nz, .loop
+.yes_fly
+	xor a ; z
+	ret
 .no_fly
-	inc a
-	and a ; nz
+	inc a ; nz
 	ret
 
 INCLUDE "data/maps/indoor_fly_maps.asm"
@@ -777,7 +767,7 @@ FlyFunction:
 	refreshmap
 	callasm .StopPalFading
 	callasm ClearSavedObjPals
-	callasm CopyBGGreenToOBPal7
+	callasm CopyLeafGreenToOBPal7
 	callasm LoadWeatherPal
 	special UpdateTimePals
 	callasm PrepareOverworldMove
@@ -789,7 +779,7 @@ FlyFunction:
 	callasm SkipUpdateMapSprites
 	loadvar VAR_MOVEMENT, PLAYER_NORMAL
 	newloadmap MAPSETUP_FLY
-	callasm CopyBGGreenToOBPal7
+	callasm CopyLeafGreenToOBPal7
 	callasm FlyToAnim
 	callasm .ClearWeatherFlyFlag
 	special WaitSFX
@@ -820,6 +810,8 @@ FlyFunction:
 	ldh [rWBK], a
 	xor a
 	ld [wPalFadeDelayFrames], a
+	ld [wPalFadeTotalSteps], a
+	ld [wPalFadeStepValue], a
 	pop af
 	ldh [rWBK], a
 	ld hl, wPalFlags
@@ -945,7 +937,7 @@ DigFunction:
 	ld a, $2
 
 EscapeRopeOrDig:
-	ld [wBuffer2], a
+	ld [wEscapeRopeOrDigType], a
 .loop
 	ld hl, .DigTable
 	call FieldMoveJumptable
@@ -961,15 +953,8 @@ EscapeRopeOrDig:
 
 .CheckCanDig:
 	call GetMapEnvironment
-	cp CAVE
-	jr z, .incave
-	cp DUNGEON
-	jr z, .incave
-.fail
-	ld a, $2
-	ret
-
-.incave
+	cp FIRST_DIGGABLE_ENV
+	jr c, .fail
 	ld hl, wDigWarpNumber
 	ld a, [hli]
 	and a
@@ -983,12 +968,16 @@ EscapeRopeOrDig:
 	ld a, $1
 	ret
 
+.fail
+	ld a, $2
+	ret
+
 .DoDig:
 	ld hl, wDigWarpNumber
 	ld de, wNextWarp
 	ld bc, 3
 	rst CopyBytes
-	ld a, [wBuffer2]
+	ld a, [wEscapeRopeOrDigType]
 	cp $2
 	jr nz, .escaperope
 	call GetPartyNickname
@@ -1005,7 +994,7 @@ EscapeRopeOrDig:
 	ret
 
 .FailDig:
-	ld a, [wBuffer2]
+	ld a, [wEscapeRopeOrDigType]
 	cp $2
 	jr nz, .failescaperope
 	ld hl, .Text_CantUseHere
@@ -1019,9 +1008,7 @@ EscapeRopeOrDig:
 
 .Text_CantUseHere:
 	; Can't use that here.
-	text_far _CantUseDigText
-	text_end
-
+	text_farend _CantUseDigText
 .UsedEscapeRopeScript:
 	refreshmap
 	special UpdateTimePals
@@ -1108,9 +1095,7 @@ TeleportFunction:
 
 .Text_CantUseHere:
 	; Can't use that here.
-	text_far _CantUseTeleportText
-	text_end
-
+	text_farend _CantUseTeleportText
 .TeleportScript:
 	refreshmap
 	special UpdateTimePals
@@ -1164,7 +1149,7 @@ PrepareOverworldMove:
 	; ld hl, wPartySpecies
 	; add hl, de
 	; ld a, [hl]
-	; ld [wBuffer6], a
+	; ld [wFishingResult], a
 	jmp GetPartyNickname
 
 Script_StrengthFromMenu:
@@ -1284,13 +1269,13 @@ TryWhirlpoolMenu:
 	pop hl
 	jr nc, .failed
 	ld a, l
-	ld [wBuffer3], a
+	ld [wCutWhirlpoolOverworldBlockAddr], a
 	ld a, h
-	ld [wBuffer4], a
+	ld [wCutWhirlpoolOverworldBlockAddr + 1], a
 	ld a, b
-	ld [wBuffer5], a
+	ld [wCutWhirlpoolReplacementBlock], a
 	xor a
-	ld [wBuffer6], a
+	ld [wCutWhirlpoolAnimationType], a
 	ret
 
 .failed
@@ -1553,7 +1538,8 @@ AutoRockSmashScript:
 	callasm RockItemEncounter
 	iffalsefwd .no_item
 	opentext
-	verbosegiveitem ITEM_FROM_MEM
+	; This random item is forfeited if the Bag is full.
+	verbosegiveitem_unsafe ITEM_FROM_MEM
 	closetext
 .no_item
 	end
@@ -1591,7 +1577,7 @@ FishFunction:
 	push af
 	call FieldMoveJumptableReset
 	pop af
-	ld [wBuffer2], a
+	ld [wFishingRodUsed], a
 .loop
 	ld hl, .FishTable
 	call FieldMoveJumptable
@@ -1630,50 +1616,16 @@ FishFunction:
 
 .goodtofish
 	ld d, a
-	ld a, [wBuffer2]
-	ld e, a
-
-	; Suction Cups and Sticky Hold boost bite rate. This is done
-	; by having these abilities result in 2 attempts being made
-	; for getting an encounter.
-	call GetLeadAbility
-	cp SUCTION_CUPS
-	jr z, .fish_attempt1
-	cp STICKY_HOLD
-	jr nz, .fish_attempt2
-.fish_attempt1
-	push bc
-	push de
-	farcall Fish
-	ld a, d
+	call TryFishEncounter
 	and a
-	pop de
-	jr nz, .gotabite1
-	pop bc
-.fish_attempt2
-	farcall Fish
-	ld a, d
-	and a
-	jr nz, .gotabite2
-	ld a, b
-	or c
 	jr z, .nonibble
-.gotanitem
-	ld a, c
-	ld [wCurItem], a
+	dec a
+	jr z, .gotabite
+	; got item
 	ld a, $5
 	ret
 
-.gotabite1
-	pop de ; we no longer care about d
-.gotabite2
-	ld [wCurPartyLevel], a
-	ld a, c
-	ld [wTempWildMonSpecies], a
-	ld a, b
-	ld [wWildMonForm], a
-	ld a, BATTLETYPE_FISH
-	ld [wBattleType], a
+.gotabite
 	ld a, $2
 	ret
 
@@ -1687,7 +1639,7 @@ FishFunction:
 
 .FishGotSomething:
 	ld a, $1
-	ld [wBuffer6], a
+	ld [wFishingResult], a
 	ld hl, Script_GotABite
 	call QueueScript
 	ld a, $81
@@ -1695,7 +1647,7 @@ FishFunction:
 
 .FishNoBite:
 	ld a, $2
-	ld [wBuffer6], a
+	ld [wFishingResult], a
 	ld hl, Script_NotEvenANibble
 	call QueueScript
 	ld a, $81
@@ -1703,7 +1655,7 @@ FishFunction:
 
 .FishNoFish:
 	xor a
-	ld [wBuffer6], a
+	ld [wFishingResult], a
 	ld hl, Script_NotEvenANibble
 	call QueueScript
 	ld a, $81
@@ -1711,7 +1663,7 @@ FishFunction:
 
 .FishGotItem:
 	ld a, $1
-	ld [wBuffer6], a
+	ld [wFishingResult], a
 	ld hl, Script_GotAnItem
 	call QueueScript
 	ld a, $81
@@ -1720,6 +1672,18 @@ FishFunction:
 Script_NotEvenANibble:
 	scall Script_FishCastRod
 	farwritetext _RodNothingText
+	yesorno
+	iffalsefwd .StopFishing
+	callasm RetryFishing
+	ifequalfwd 1, .GotABite
+	ifequalfwd 2, .GotAnItem
+	; no nibble: loop back
+	sjump Script_NotEvenANibble
+.GotABite:
+	sjumpfwd Script_GotABite
+.GotAnItem:
+	sjumpfwd Script_GotAnItem
+.StopFishing:
 	closetext
 	callasm PutTheRodAway
 	end
@@ -1738,7 +1702,8 @@ Script_GotAnItem:
 	callasm PutTheRodAway
 	callasm CurItemToScriptVar
 	opentext
-	verbosegiveitem ITEM_FROM_MEM
+	; This random item is forfeited if the Bag is full.
+	verbosegiveitem_unsafe ITEM_FROM_MEM
 	endtext
 
 Script_GotABite:
@@ -1798,7 +1763,7 @@ Fishing_CheckFacingUp:
 
 Script_FishCastRod:
 	refreshmap
-	loadmem hBGMapMode, $0
+	loadmem hBGMapMode, NO_BG_MAP_TRANSFER
 	special UpdateTimePals
 	callasm LoadFishingGFX
 	loademote EMOTE_SHOCK
@@ -1812,6 +1777,7 @@ MovementData_CastRod:
 
 PutTheRodAway:
 	xor a
+	assert NO_BG_MAP_TRANSFER == 0
 	ldh [hBGMapMode], a
 	ld a, $1
 	ld [wPlayerAction], a
@@ -1821,6 +1787,73 @@ PutTheRodAway:
 CurItemToScriptVar:
 	ld a, [wCurItem]
 	ldh [hScriptVar], a
+	ret
+
+RetryFishing:
+; Retry fishing with the same rod. Sets hScriptVar to:
+; 0 = no nibble, 1 = got a bite, 2 = got an item
+	farcall GetFishingGroup
+	jr nc, .no_nibble
+	ld d, a
+	call TryFishEncounter
+	ldh [hScriptVar], a
+	ret
+.no_nibble
+	xor a
+	ldh [hScriptVar], a
+	ret
+
+TryFishEncounter:
+; Try to get a fishing encounter.
+; Input: d = fishing group
+; Output: a = 0 (no nibble), 1 (got a bite), 2 (got an item)
+; Side effects: sets up battle data for bites, wCurItem for items
+	ld a, [wFishingRodUsed]
+	ld e, a
+	; Suction Cups and Sticky Hold boost bite rate. This is done
+	; by having these abilities result in 2 attempts being made
+	; for getting an encounter.
+	call GetLeadAbility
+	cp SUCTION_CUPS
+	jr z, .attempt1
+	cp STICKY_HOLD
+	jr nz, .attempt2
+.attempt1
+	push bc
+	push de
+	farcall Fish
+	ld a, d
+	and a
+	pop de
+	jr nz, .got_bite_pop
+	pop bc
+.attempt2
+	farcall Fish
+	ld a, d
+	and a
+	jr nz, .got_bite
+	ld a, b
+	or c
+	jr z, .no_nibble
+	; got an item
+	ld a, c
+	ld [wCurItem], a
+	ld a, 2
+	ret
+.got_bite_pop
+	pop bc ; discard saved bc
+.got_bite
+	ld [wCurPartyLevel], a
+	ld a, c
+	ld [wTempWildMonSpecies], a
+	ld a, b
+	ld [wWildMonForm], a
+	ld a, BATTLETYPE_FISH
+	ld [wBattleType], a
+	ld a, 1
+	ret
+.no_nibble
+	xor a
 	ret
 
 BikeFunction:
@@ -1833,8 +1866,9 @@ BikeFunction:
 	call .CheckEnvironment
 	jr c, .CannotUseBike
 	ld a, [wPlayerState]
-	and a ; cp PLAYER_NORMAL
-	jr z, .GetOnBike
+	assert PLAYER_NORMAL == 0 && PLAYER_RUN == 1
+	cp PLAYER_RUN + 1
+	jr c, .GetOnBike
 	cp PLAYER_BIKE
 	jr z, .GetOffBike
 	jr .CannotUseBike
@@ -1878,13 +1912,11 @@ BikeFunction:
 
 .CheckEnvironment:
 	call GetMapEnvironment
-	call CheckOutdoorMap
-	jr z, .ok
+	cp FIRST_INDOOR_ENV
+	jr c, .ok
 	cp CAVE
 	jr z, .ok
 	cp GATE
-	jr z, .ok
-	cp ISOLATED
 	jr nz, .nope
 
 .ok

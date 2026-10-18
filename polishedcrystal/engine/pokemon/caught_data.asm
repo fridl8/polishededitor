@@ -123,15 +123,24 @@ CheckPartyFullAfterContest:
 	ret
 
 GiveANickname_YesNo:
+	ld a, [wOptions3]
+	bit NICKNAMES_NEVER, a
+	jr nz, .no
+	bit NICKNAMES_ALWAYS, a
+	jr nz, .yes
 	ld hl, TextJump_GiveANickname
 	call PrintText
 	jmp YesNoBox
+.yes
+	and a ; clear carry
+	ret
+.no
+	scf
+	ret
 
 TextJump_GiveANickname:
 	; Give a nickname to the @  you received?
-	text_far _CaughtAskNicknameText
-	text_end
-
+	text_farend _CaughtAskNicknameText
 SetCaughtData:
 	ld a, [wPartyCount]
 	dec a

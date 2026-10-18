@@ -21,6 +21,8 @@ DEF JOYPAD_DISABLE_SGB_TRANSFER_F EQU 7
 ; wOptions3::
 	const_def
 	const QWERTY_KEYBOARD_F  ; 0
+	const NICKNAMES_ALWAYS   ; 1
+	const NICKNAMES_NEVER    ; 2
 
 ; wOptions1::
 	const_def 3
@@ -75,6 +77,7 @@ DEF NUM_FRAMES EQU const_value
 	const NO_LINE_SPACING_F  ; 2
 	const USE_BG_MAP_WIDTH_F ; 3
 	const NEWLINE_ENEMY_F    ; 4
+	const NO_TEXT_PAUSE_F    ; 5
 
 ; wOptions2::
 	const_def 3
@@ -115,7 +118,8 @@ DEF LINK_OPTMASK EQU (1 << NATURES_OPT) | (1 << ABILITIES_OPT) | (1 << PERFECT_I
 	const NO_EXP_OPT           ; 2
 	const RTC_OPT              ; 3
 	const EVOLVE_IN_BATTLE_OPT ; 4
-	const_skip 2
+	const_skip                 ; 5
+	const DEXNAV_CALM_OPT      ; 6
 	const RESET_INIT_OPTS      ; 7
 
 	const_def
@@ -123,6 +127,12 @@ DEF LINK_OPTMASK EQU (1 << NATURES_OPT) | (1 << ABILITIES_OPT) | (1 << PERFECT_I
 	const EVS_OPT_CLASSIC  ; %01
 	const EVS_OPT_MODERN   ; %10
 DEF EV_OPTMASK EQU %11
+
+; wOptionsMenuDescriptionState::
+	const_def
+	const OPTDESCSTATE_PAGE   ; 0 (stopped at '<PARA>')
+	const OPTDESCSTATE_SCROLL ; 1 (stopped at '<CONT>')
+	const OPTDESCSTATE_DONE   ; 2 (stopped at '<PROMPT>')
 
 ; wForgettingMove::
 	const_def 6
@@ -200,6 +210,7 @@ DEF PLAYERSPRITESETUP_RESET_ACTION_F    EQU 7
 	const PLAYER_MALE   ; 0
 	const PLAYER_FEMALE ; 1
 	const PLAYER_ENBY   ; 2
+	const PLAYER_BETA   ; 3
 DEF NUM_PLAYER_GENDERS EQU const_value
 
 ; wMapStatus::
@@ -329,11 +340,14 @@ DEF NUM_BADGES EQU NUM_JOHTO_BADGES + NUM_KANTO_BADGES
 	const OWSTATE_CUT             ; 8
 
 ; wPlayerState::
-DEF PLAYER_NORMAL    EQU 0
-DEF PLAYER_BIKE      EQU 1
-DEF PLAYER_SKATE     EQU 2
-DEF PLAYER_SURF      EQU 4
-DEF PLAYER_SURF_PIKA EQU 8
+	const_def
+	const PLAYER_NORMAL    ; 0
+	const PLAYER_RUN       ; 1
+	const PLAYER_BIKE      ; 2
+	const PLAYER_SKATE     ; 3
+	const PLAYER_SURF      ; 4
+	const PLAYER_SURF_PIKA ; 5
+DEF NUM_PLAYER_STATES EQU const_value
 
 ; wPalFadeMode::
 DEF PALFADE_WHICH        EQU %11
@@ -519,6 +533,7 @@ DEF CAUGHT_BIRDS_MASK  EQU (1 << PLAYER_CAUGHT_ARTICUNO_F) | (1 << PLAYER_CAUGHT
 	const DISABLE_DYN_PAL_F              ; 3
 	const NO_DYN_PAL_APPLY_UNTIL_RESET_F ; 4
 	const MAP_CONNECTION_PAL_F           ; 5
+	const SKIP_MAP_CONNECTION_PAL_FADE_F ; 6
 DEF NO_DYN_PAL_APPLY EQU (1 << NO_DYN_PAL_APPLY_ONCE_F) | (1 << NO_DYN_PAL_APPLY_UNTIL_RESET_F)
 
 ; wMapSetupFlags
@@ -530,3 +545,13 @@ DEF NUM_SRAM_BANKS EQU 4
 
 ; rLCDC::
 DEF LCDC_DEFAULT EQU LCDC_ON | LCDC_WIN_9C00 | LCDC_WIN_ON | LCDC_BLOCK21 | LCDC_BG_9800 | LCDC_OBJ_8 | LCDC_OBJ_ON | LCDC_PRIO_ON
+
+; hBGMapMode::
+	const_def
+	const NO_BG_MAP_TRANSFER   ; 0
+	const TRANSFER_TILEMAP     ; 1: from wTilemap to 0:[hBGMapAddress]
+	const TRANSFER_ATTRMAP     ; 2: from wAttrmap to 1:[hBGMapAddress]
+	const TRANSFER_TILEMAP1    ; 3: from wTilemap to vBGMap1
+	const TRANSFER_ATTRMAP1    ; 4: from wAttrmap to vBGMap3
+	const TRANSFER_TILEMAP_OFS ; 5: like TRANSFER_TILEMAP, but starts on the [hBGMapHalf]th row
+	const TRANSFER_ATTRMAP_OFS ; 6: like TRANSFER_ATTRMAP, but starts on the [hBGMapHalf]th row

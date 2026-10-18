@@ -52,6 +52,7 @@ _TypeChart:
 	ldh [rLCDC], a
 
 	xor a
+	assert NO_BG_MAP_TRANSFER == 0
 	ldh [hBGMapMode], a
 
 	ld hl, TypeChartTilemap
@@ -96,19 +97,19 @@ TypeChartPalettes:
 INCLUDE "gfx/type_chart/type_chart.pal"
 
 TypeChartBG0GFX:
-INCBIN "gfx/type_chart/bg0.2bpp.lz"
+INCBIN "gfx/type_chart/bg0.2bpp.lzp"
 
 TypeChartBG1GFX:
-INCBIN "gfx/type_chart/bg.2bpp.vram2p.lz"
+INCBIN "gfx/type_chart/bg.2bpp.vram2p.lzp"
 
 TypeChartOBGFX:
-INCBIN "gfx/type_chart/ob.2bpp.lz"
+INCBIN "gfx/type_chart/ob.2bpp.lzp"
 
 TypeChartTilemap:
-INCBIN "gfx/type_chart/type_chart.tilemap.lz"
+INCBIN "gfx/type_chart/type_chart.tilemap.lzp"
 
 TypeChartAttrmap:
-INCBIN "gfx/type_chart/type_chart.attrmap.lz"
+INCBIN "gfx/type_chart/type_chart.attrmap.lzp"
 
 TypeChartOAMData:
 MACRO oamdata

@@ -10,6 +10,7 @@ PokemonCenterPC:
 	call LoadMenuHeader
 .loop
 	xor a
+	assert NO_BG_MAP_TRANSFER == 0
 	ldh [hBGMapMode], a
 	call .ChooseWhichPCListToUse
 	ld [wWhichIndexSet], a
@@ -94,9 +95,7 @@ PC_CheckPartyForPokemon:
 
 .MustHavePokemonToUse:
 	; Bzzzzt! You must have a #MON to use this!
-	text_far _PokecenterPCCantUseText
-	text_end
-
+	text_farend _PokecenterPCCantUseText
 BillsPC:
 	call PC_PlayChoosePCSound
 	ld hl, PokeCenterPCText_AccessedBillsPC
@@ -182,9 +181,7 @@ _PlayersHousePC:
 
 PlayersPCTurnOnText:
 	; turned on the PC.
-	text_far _PlayersPCTurnOnText
-	text_end
-
+	text_farend _PlayersPCTurnOnText
 _PlayersPC:
 	ld a, b
 	ld [wWhichIndexSet], a
@@ -282,12 +279,11 @@ PC_DisplayTextWaitMenu:
 
 PlayersPCAskWhatDoText:
 	; What do you want to do?
-	text_far _PlayersPCAskWhatDoText
-	text_end
-
+	text_farend _PlayersPCAskWhatDoText
 ClearPCItemScreen:
 	call DisableSpriteUpdates
 	xor a
+	assert NO_BG_MAP_TRANSFER == 0
 	ldh [hBGMapMode], a
 	call ClearBGPalettes
 	call ClearSprites
@@ -327,22 +323,23 @@ PlayerWithdrawItemMenu:
 	ret c
 
 	ld a, [wItemQuantityChangeBuffer]
-	ld [wBuffer1], a ; quantity
+	ld [wPCItemQuantityChange], a ; quantity
 	ld a, [wCurItemQuantity]
-	ld [wBuffer2], a
+	ld [wPCItemQuantity], a
 	ld hl, wNumItems
 	call ReceiveItem
 	jr nc, .PackFull
-	ld a, [wBuffer1]
+	ld a, [wPCItemQuantityChange]
 	ld [wItemQuantityChangeBuffer], a
-	ld a, [wBuffer2]
+	ld a, [wPCItemQuantity]
 	ld [wCurItemQuantity], a
 	ld hl, wNumPCItems
 	call TossItem
-	predef PartyMonItemName
+	farcall PartyMonItemName
 	ld hl, .WithdrewText
 	call MenuTextbox
 	xor a
+	assert NO_BG_MAP_TRANSFER == 0
 	ldh [hBGMapMode], a
 	jmp ExitMenu
 
@@ -351,17 +348,11 @@ PlayerWithdrawItemMenu:
 	jmp MenuTextboxBackup
 
 .HowManyText:
-	text_far _PlayersPCHowManyWithdrawText
-	text_end
-
+	text_farend _PlayersPCHowManyWithdrawText
 .WithdrewText:
-	text_far _PlayersPCWithdrewItemsText
-	text_end
-
+	text_farend _PlayersPCWithdrewItemsText
 .NoRoomText:
-	text_far _PlayersPCNoRoomWithdrawText
-	text_end
-
+	text_farend _PlayersPCNoRoomWithdrawText
 PlayerTossItemMenu:
 	call LoadStandardMenuHeader
 	call ClearPCItemScreen
@@ -422,9 +413,7 @@ PlayerDepositItemMenu:
 
 .NoItemsInBag:
 	; No items here!
-	text_far _PlayersPCNoItemsText
-	text_end
-
+	text_farend _PlayersPCNoItemsText
 .TryDepositItem:
 	call CheckUniqueItemPocket
 	jr z, .CantDepositItem
@@ -456,15 +445,15 @@ PlayerDepositItemMenu:
 	dw .tossable
 
 .tossable
-	ld a, [wBuffer1]
+	ld a, [wPCItemQuantityChange]
 	push af
-	ld a, [wBuffer2]
+	ld a, [wPCItemQuantity]
 	push af
 	call .DepositItem_
 	pop af
-	ld [wBuffer2], a
+	ld [wPCItemQuantity], a
 	pop af
-	ld [wBuffer1], a
+	ld [wPCItemQuantityChange], a
 	ret
 
 .DepositItem_:
@@ -478,19 +467,19 @@ PlayerDepositItemMenu:
 	jr c, .DeclinedToDeposit
 
 	ld a, [wItemQuantityChangeBuffer]
-	ld [wBuffer1], a
+	ld [wPCItemQuantityChange], a
 	ld a, [wCurItemQuantity]
-	ld [wBuffer2], a
+	ld [wPCItemQuantity], a
 	ld hl, wNumPCItems
 	call ReceiveItem
 	jr nc, .NoRoomInPC
-	ld a, [wBuffer1]
+	ld a, [wPCItemQuantityChange]
 	ld [wItemQuantityChangeBuffer], a
-	ld a, [wBuffer2]
+	ld a, [wPCItemQuantity]
 	ld [wCurItemQuantity], a
 	ld hl, wNumItems
 	call TossItem
-	predef PartyMonItemName
+	farcall PartyMonItemName
 	ld hl, .DepositText
 	jmp PrintText
 
@@ -503,21 +492,13 @@ PlayerDepositItemMenu:
 	ret
 
 .CantDepositItemText:
-	text_far _PlayersPCCantDepositItemText
-	text_end
-
+	text_farend _PlayersPCCantDepositItemText
 .HowManyText:
-	text_far _PlayersPCHowManyDepositText
-	text_end
-
+	text_farend _PlayersPCHowManyDepositText
 .DepositText:
-	text_far _PlayersPCDepositItemsText
-	text_end
-
+	text_farend _PlayersPCDepositItemsText
 .NoRoomText:
-	text_far _PlayersPCNoRoomDepositText
-	text_end
-
+	text_farend _PlayersPCNoRoomDepositText
 PlayerMailBoxMenu:
 	farcall _PlayerMailBoxMenu
 	xor a
@@ -611,30 +592,19 @@ PC_DisplayText:
 
 PokeCenterPCText_BootedUpPC:
 	; turned on the PC.
-	text_far _PokecenterPCTurnOnText
-	text_end
-
+	text_farend _PokecenterPCTurnOnText
 PokeCenterPCText_AccessWhosePC:
 	; Access whose PC?
-	text_far _PokecenterPCWhoseText
-	text_end
-
+	text_farend _PokecenterPCWhoseText
 PokeCenterPCText_AccessedBillsPC:
 	; BILL's PC accessed. #MON Storage System opened.
-	text_far _PokecenterBillsPCText
-	text_end
-
+	text_farend _PokecenterBillsPCText
 PokeCenterPCText_AccessedOwnPC:
 	; Accessed own PC. Item Storage System opened.
-	text_far _PokecenterPlayersPCText
-	text_end
-
+	text_farend _PokecenterPlayersPCText
 PokeCenterPCText_AccessedOaksPC:
 	; PROF.OAK's PC accessed. #DEX Rating System opened.
-	text_far _PokecenterOaksPCText
-	text_end
-
+	text_farend _PokecenterOaksPCText
 PokeCenterPCText_LinkClosed:
 	; … Link closed…
-	text_far _PokecenterPCOaksClosedText
-	text_end
+	text_farend _PokecenterPCOaksClosedText

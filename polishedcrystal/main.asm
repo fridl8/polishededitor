@@ -5,23 +5,25 @@ INCLUDE "engine/gfx/load_push_oam.asm"
 INCLUDE "engine/overworld/map_objects.asm"
 INCLUDE "engine/menus/intro_menu.asm"
 INCLUDE "engine/overworld/init_map.asm"
-INCLUDE "engine/menus/init_options.asm"
 INCLUDE "engine/pokemon/learn.asm"
 INCLUDE "data/items/attributes.asm"
 INCLUDE "engine/overworld/npc_movement.asm"
 INCLUDE "engine/events/happiness_egg.asm"
-INCLUDE "engine/events/shiny_ditto.asm"
-INCLUDE "engine/events/shuckle.asm"
 INCLUDE "engine/events/bills_grandfather.asm"
 INCLUDE "engine/events/hidden_power_guru.asm"
-INCLUDE "engine/events/mint_tea.asm"
 INCLUDE "engine/events/haircut_etc.asm"
+
+
+SECTION "Special Events", ROMX
+
+INCLUDE "engine/events/shiny_ditto.asm"
+INCLUDE "engine/events/shuckle.asm"
+INCLUDE "engine/events/mint_tea.asm"
 
 
 SECTION "bank2", ROMX
 
 INCLUDE "engine/overworld/player_object.asm"
-INCLUDE "data/predef_pointers.asm"
 INCLUDE "engine/gfx/color.asm"
 
 
@@ -62,6 +64,7 @@ SECTION "Load Map Part", ROMX
 ; do not separate
 INCLUDE "engine/overworld/player_step.asm"
 INCLUDE "engine/overworld/load_map_part.asm"
+INCLUDE "engine/overworld/stream_map_part.asm"
 
 
 SECTION "bank4", ROMX
@@ -282,6 +285,7 @@ INCLUDE "engine/events/card_key.asm"
 INCLUDE "engine/events/basement_key.asm"
 INCLUDE "engine/events/sacred_ash.asm"
 INCLUDE "engine/events/sweet_honey.asm"
+INCLUDE "engine/events/fossils.asm"
 
 
 SECTION "bank14", ROMX
@@ -292,8 +296,9 @@ INCLUDE "engine/pokemon/types.asm"
 INCLUDE "engine/pokemon/mon_stats.asm"
 INCLUDE "engine/pokemon/experience.asm"
 INCLUDE "engine/pokemon/switchpartymons.asm"
-INCLUDE "engine/gfx/load_pics.asm"
 INCLUDE "engine/pokemon/natures.asm"
+INCLUDE "engine/gfx/load_pics.asm"
+INCLUDE "engine/gfx/load_font.asm"
 
 
 SECTION "Base Data", ROMX
@@ -518,20 +523,20 @@ SECTION "bank38", ROMX
 
 INCLUDE "engine/games/card_flip.asm"
 INCLUDE "engine/games/unown_puzzle.asm"
-;INCLUDE "engine/games/memory_game.asm"
 INCLUDE "engine/gfx/fade.asm"
 
 
 SECTION "bank39", ROMX
 
-INCLUDE "engine/menus/options_menu.asm"
 INCLUDE "engine/movie/splash.asm"
 INCLUDE "engine/movie/intro.asm"
 
 
-SECTION "Typefaces", ROMX
+SECTION "Options Menus", ROMX
 
-INCLUDE "engine/gfx/load_font.asm"
+INCLUDE "engine/menus/options_menu_shared.asm"
+INCLUDE "engine/menus/initial_options_menu.asm"
+INCLUDE "engine/menus/options_menu.asm"
 
 
 SECTION "bank3E", ROMX
@@ -736,3 +741,8 @@ INCLUDE "audio/music/printer.asm"
 SECTION "LureMenu", ROMX
 
 INCLUDE "engine/menus/lure_menu.asm"
+
+
+SECTION "DexNav", ROMX
+
+INCLUDE "engine/dexnav/dexnav.asm"

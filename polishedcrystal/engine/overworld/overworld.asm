@@ -8,42 +8,31 @@ _UpdatePlayerSprite::
 	res 5, [hl]
 	jmp GetUsedSprite
 
-GetPlayerSprite:
+GetPlayerSpriteInA:
 	ld a, [wPlayerGender]
-	ld hl, ChrisStateSprites
-	and a ; PLAYER_MALE
-	jr z, .go
-	ld hl, KrisStateSprites
-	dec a ; PLAYER_FEMALE
-	jr z, .go
-	; PLAYER_ENBY
-	ld hl, CrysStateSprites
-.go
+	assert NUM_PLAYER_STATES == 6
+	ld h, a
+	add a ; * 2
+	add h ; * 3
+	add a ; * 6
+	ld h, a
 	ld a, [wPlayerState]
-	ld c, a
-.loop
-	ld a, [hli]
-	cp c
-	jr z, .good
-	inc hl
-	cp $ff
-	jr nz, .loop
-
-; Any player state not in the array defaults to Chris's sprite.
-	xor a ; ld a, PLAYER_NORMAL
-	ld [wPlayerState], a
-	ld a, SPRITE_CHRIS
-	jr .finish
-
-.good
+	add h
+	add LOW(PlayerStateSprites)
+	ld l, a
+	adc HIGH(PlayerStateSprites)
+	sub l
+	ld h, a
 	ld a, [hl]
+	ret
 
-.finish
+GetPlayerSprite:
+	call GetPlayerSpriteInA
 	ld [wPlayerSprite], a
 	ld [wPlayerObjectSprite], a
 	ret
 
-INCLUDE "data/sprites/player_sprites.asm"
+INCLUDE "data/player/state_sprites.asm"
 
 RefreshSprites::
 	push hl
@@ -147,6 +136,8 @@ GetSprite::
 
 GetMonSprite:
 ; Return carry if a monster sprite was loaded.
+	cp SPRITE_AQUARIUM_MON
+	jr z, .MonIcon
 	cp SPRITE_MON_ICON
 	jr z, .MonIcon
 	cp SPRITE_MON_DOLL_1
@@ -257,6 +248,7 @@ DoesSpriteHaveFacings::
 	jr c, .facings
 	cp SPRITE_VARS
 	jr nc, .facings
+.no_facings
 	scf
 	ret
 
@@ -265,9 +257,13 @@ DoesSpriteHaveFacings::
 	ret
 
 _GetSpritePalette::
+	cp SPRITE_AQUARIUM_MON
+	jr z, .aquarium_mon
 	call GetMonSprite
-	jr c, .is_pokemon
+	jr nc, .standard_palette
+	farjp GetOverworldMonIconPalette
 
+.standard_palette
 	ld hl, SpriteHeaders + SPRITEDATA_TYPE_PAL - SPRITEDATA_LENGTH
 	ld c, a
 	ld b, 0
@@ -277,8 +273,13 @@ _GetSpritePalette::
 	and SPRITEDATA_PALETTE_MASK
 	ret
 
-.is_pokemon
-	farjp GetOverworldMonIconPalette
+.aquarium_mon
+	; SPRITE_AQUARIUM_MON uses Pokémon icon *graphics* but not *palette*.
+	; Assume that the `object_event` assigns its own palette, so this can just
+	; return a dummy 0 palette in `a`.
+	call GetMonSprite
+	xor a
+	ret
 
 GetUsedSprite::
 	ldh a, [hUsedSpriteIndex]

@@ -4,18 +4,14 @@ Kurt_PrintTextWhichApricorn:
 
 .Text:
 	; Which APRICORN should I use?
-	text_far _WhichApricornText
-	text_end
-
+	text_farend _WhichApricornText
 Kurt_PrintTextHowMany:
 	ld hl, .Text
 	jmp PrintText
 
 .Text:
 	; How many should I make?
-	text_far _HowManyShouldIMakeText
-	text_end
-
+	text_farend _HowManyShouldIMakeText
 Special_SelectApricornForKurt:
 	call LoadStandardMenuHeader
 	ld c, $1
@@ -56,6 +52,7 @@ Kurt_SelectApricorn:
 	ld a, [wMenuSelection]
 	ld [wMenuCursorBuffer], a
 	xor a
+	assert NO_BG_MAP_TRANSFER == 0
 	ldh [hBGMapMode], a
 	call InitScrollingMenu
 	call UpdateSprites
@@ -86,7 +83,7 @@ Kurt_SelectApricorn:
 	db $10 ; flags
 	db 4, 7
 	db 1
-	dbw 0, wBuffer1
+	dbw 0, wKurtApricornCount
 	dba .Name
 	dba .Quantity
 	dba NULL
@@ -125,7 +122,7 @@ Kurt_SelectQuantity:
 	call MenuBox
 	call ApplyTilemap
 .loop
-	ld a, 1
+	ld a, TRANSFER_TILEMAP
 	ldh [hBGMapMode], a
 	call MenuBox
 	call .PlaceApricornName
@@ -200,7 +197,7 @@ Kurt_GiveUpSelectedQuantityOfSelectedApricorn:
 
 Kurt_FindApricornsInBag:
 ; Checks the bag for Apricorns.
-	ld hl, wBuffer1
+	ld hl, wKurtApricornCount
 	xor a
 	ld [hli], a
 	dec a
@@ -217,7 +214,7 @@ Kurt_FindApricornsInBag:
 	ld a, b
 	cp NUM_APRICORNS + 1
 	jr c, .loop
-	ld a, [wBuffer1]
+	ld a, [wKurtApricornCount]
 	and a
 	ret nz
 	scf
@@ -225,7 +222,7 @@ Kurt_FindApricornsInBag:
 
 .addtobuffer
 	push hl
-	ld hl, wBuffer1
+	ld hl, wKurtApricornCount
 	inc [hl]
 	ld e, [hl]
 	ld d, 0

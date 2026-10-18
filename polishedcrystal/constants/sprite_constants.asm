@@ -178,11 +178,11 @@
 	const SPRITE_BIG_ONIX ; ae
 	const SPRITE_BIG_GYARADOS ; af
 	const SPRITE_PIDGEOTTO_SIDE ; b0
-	const SPRITE_RATTATA_BACK ; b1 (blank side frame)
+	const SPRITE_RATTATA_BACK ; b1
 	const SPRITE_SLOWPOKETAIL ; b2
 	const SPRITE_WEIRD_TREE ; b3
-	const SPRITE_BALL_CUT_FRUIT ; b4
-	const SPRITE_BOULDER_ROCK_FOSSIL ; b5
+	const SPRITE_BALL_CUT_TREE ; b4
+	const SPRITE_BOULDER_ROCK ; b5
 	const SPRITE_BOOK_PAPER_POKEDEX ; b6
 	const SPRITE_SNES ; b7
 	const SPRITE_N64 ; b8
@@ -193,23 +193,39 @@
 	const SPRITE_ELECTRIC_FENCE_LEFT ; bd
 	const SPRITE_ELECTRIC_FENCE_RIGHT ; be
 	const SPRITE_SAILBOAT ; bf
-	const SPRITE_ICE_BOULDER ; c0
+	const SPRITE_ICE_BOULDER_FOSSILS ; c0
 	const SPRITE_BEACH_GUY ; c1
 	const SPRITE_BEACH_GIRL ; c2
 	const SPRITE_PIERS ; c3
-	const SPRITE_KATY ; c4
+	const SPRITE_LARRY ; c4
 	const SPRITE_ALOLAN_EXEGGUTOR ; c5
 	const SPRITE_SOLDIER ; c6
 	const SPRITE_CRYS ; c7
 	const SPRITE_CRYS_BIKE ; c8
 	const SPRITE_CRYS_SURF ; c9
 	const SPRITE_THORTON ; ca
+	const SPRITE_CHRIS_RUN ; cb
+	const SPRITE_KRIS_RUN ; cc
+	const SPRITE_CRYS_RUN ; cd
+	const SPRITE_BLANK_FRUIT ; ce
+	const SPRITE_BIG_HO_OH ; cf
+	const SPRITE_BIG_LUGIA ; d0
+	const SPRITE_BETA ; d1
+	const SPRITE_BETA_BIKE ; d2
+	const SPRITE_BETA_SURF ; d3
+	const SPRITE_BETA_RUN ; d4
+	const SPRITE_FLOATING_BALL ; d5
+	const SPRITE_SPINARAK_CART ; d6
+	const SPRITE_PEARL ; d7
+	const SPRITE_PAGODA ; d8
+	const SPRITE_CAMPFIRE ; d9
 DEF NUM_OVERWORLD_SPRITES EQU const_value - 1
 
 ; special GetMonSprite values (see engine/overworld/overworld.asm)
-	const_next $ef
+	const_next $ee
 DEF SPRITE_POKEMON EQU const_value
-	const SPRITE_MON_ICON ; ef
+	const SPRITE_MON_ICON ; ee
+	const SPRITE_AQUARIUM_MON ; ef
 	const SPRITE_MON_DOLL_1 ; f0
 	const SPRITE_MON_DOLL_2 ; f1
 	const SPRITE_DAYCARE_MON_1 ; f2

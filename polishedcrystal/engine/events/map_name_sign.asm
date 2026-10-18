@@ -1,7 +1,6 @@
 DEF POPUP_MAP_NAME_START  EQU $e0
 DEF POPUP_MAP_NAME_SIZE   EQU 18
 DEF POPUP_MAP_FRAME_START EQU $f3
-DEF POPUP_MAP_FRAME_SIZE  EQU 8
 DEF POPUP_MAP_FRAME_SPACE EQU $fb
 
 ; wLandmarkSignTimer
@@ -40,7 +39,7 @@ InitMapNameSign::
 	ld a, [wCurLandmark]
 	ld [wPrevLandmark], a
 
-	call .CheckSpecialMap
+	call .CheckSpecialLandmark
 	jr z, .dont_do_map_sign
 
 	ld a, [wCurLandmark]
@@ -115,7 +114,7 @@ InitMapNameSign::
 	and a ; cp SPECIAL_MAP
 	ret
 
-.CheckSpecialMap:
+.CheckSpecialLandmark:
 	cp -1
 	ret z
 	and a ; cp SPECIAL_MAP
@@ -124,7 +123,7 @@ InitMapNameSign::
 	ret z
 	cp LAV_RADIO_TOWER
 	ret z
-	cp UNDERGROUND
+	cp UNDERGROUND_PATH
 	ret z
 	cp POWER_PLANT
 	ret z
@@ -149,11 +148,17 @@ InitMapNameSign::
 .not_national_park_gate
 	assert GROUP_OLIVINE_PORT == GROUP_VERMILION_PORT
 	cp GROUP_OLIVINE_PORT
-	ret nz
+	jr nz, .not_port
 	ld a, [wMapNumber]
 	cp MAP_OLIVINE_PORT
 	ret z
 	cp MAP_VERMILION_PORT
+	ret
+.not_port
+	cp GROUP_CHERRYGROVE_TRAIN_TRACK_DUAL
+	ret nz
+	ld a, [wMapNumber]
+	cp MAP_CHERRYGROVE_TRAIN_TRACK_DUAL
 	ret
 
 PlaceMapNameSign::
@@ -214,15 +219,19 @@ LoadMapNameSignGFX:
 	ld hl, vTiles0 tile POPUP_MAP_FRAME_SPACE
 	call GetOpaque1bppSpaceTile
 	; load sign frame
-	ld hl, Signs
-	ld bc, POPUP_MAP_FRAME_SIZE tiles
 	ld a, [wSign]
-	rst AddNTimes
-	ld d, h
-	ld e, l
-	ld hl, vTiles0 tile POPUP_MAP_FRAME_START
-	lb bc, BANK(Signs), POPUP_MAP_FRAME_SIZE
-	call Get2bpp
+	add a
+	add LOW(Signs)
+	ld l, a
+	adc HIGH(Signs)
+	sub l
+	ld h, a
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	ld de, vTiles0 tile POPUP_MAP_FRAME_START
+	lb bc, BANK("Map Name Sign Graphics"), 8
+	call DecompressRequest2bpp
 	; clear landmark name area
 	ld hl, vTiles0 tile POPUP_MAP_NAME_START
 	ld e, POPUP_MAP_NAME_SIZE
@@ -313,9 +322,9 @@ LoadMapNameSignGFX:
 	ld c, l
 	pop hl
 	; hl = start of font tile graphic
-	push de
+	push bc
 	farcall LoadStandardFontPointer
-	pop de
+	pop bc
 	add hl, bc
 .got_tile
 	; swap hl and de, so de = font tile graphic, and hl = vram
@@ -334,10 +343,7 @@ LoadMapNameSignGFX:
 	pop hl
 	jr .loop
 
-SignPals:
-	table_width 1 palettes
-INCLUDE "gfx/signs/signs.pal"
-	assert_table_length NUM_SIGNS
+INCLUDE "data/maps/map_name_signs.asm"
 
 InitMapNameFrame:
 ; InitMapSignAttrMap

@@ -116,6 +116,7 @@ VBABSODMessage:
 BSODErrorStrings:
 	table_width 1
 	dr .Rst0             ; ERR_RST_0
+	dr .Rst38            ; ERR_RST_38
 	dr .DivZero          ; ERR_DIV_ZERO
 	dr .EggSpecies       ; ERR_EGG_SPECIES
 	dr .ExecutingRAM     ; ERR_EXECUTING_RAM
@@ -123,14 +124,18 @@ BSODErrorStrings:
 	dr .StackUnderflow   ; ERR_STACK_UNDERFLOW
 	dr .OldBTState       ; ERR_BT_STATE
 	dr .ChecksumMismatch ; ERR_CHECKSUM_MISMATCH
-	dr .OldBox           ; ERR_OLDBOX
-	dr .NewBox           ; ERR_NEWBOX
-	dr .WinStackOverflow ; ERR_WINSTACK_OVERFLOW
+	dr .PCBoxOld         ; ERR_PC_BOX_OLD
+	dr .PCBoxZero        ; ERR_PC_BOX_ZERO
+	dr .PCBoxCollision   ; ERR_PC_BOX_COLLISION
+	dr .WindowOverflow   ; ERR_WINDOW_OVERFLOW
+	dr .WindowUnderflow  ; ERR_WINDOW_UNDERFLOW
 	dr .SRAMMismatch     ; ERR_SRAM_MISMATCH
+	dr .PEBKAC           ; ERR_PEBKAC
 	dr .UnknownError     ; unknown
 	assert_table_length NUM_ERR_CODES + 1
 
-.Rst0:             text "rst 0@"
+.Rst0:             text "rst 00h@"
+.Rst38:            text "rst 38h@"
 .DivZero:          text "Division by zero@"
 .EggSpecies:       text "<PK><MN> species is Egg@"
 .ExecutingRAM:     text "Executing RAM@"
@@ -138,8 +143,28 @@ BSODErrorStrings:
 .StackUnderflow:   text "Stack underflow@"
 .OldBTState:       text "Old Battle Tower@"
 .ChecksumMismatch: text "Checksum mismatch@"
-.OldBox:           text "Old PC Box storage@"
-.NewBox:           text "Fatal PC Box error@"
-.WinStackOverflow: text "Win.stack overflow@"
+.PCBoxOld:         text "Old PC Box storage@"
+.PCBoxZero:        text "Accessed PC Box 0@"
+.PCBoxCollision:   text "PC Box collision@"
+.WindowOverflow:   text "Window overflow@"
+.WindowUnderflow:  text "Window underflow@"
 .SRAMMismatch:     text "SRAM/WRAM mismatch@"
-.UnknownError:     text "Unknown error@"
+.PEBKAC:           text "PEBKAC@"
+.UnknownError:     text "Unknown@"
+
+CheckVBA:
+	xor a
+	ldh [rSC], a ; no-optimize redundant loads (VBA loads this wrong)
+	ldh a, [rSC]
+	or ~%01111100
+	inc a
+	ret z
+	assert STARTOF(WRAM0) <= wEchoRAMTest && wEchoRAMTest < STARTOF(WRAM0) + SIZEOF(WRAM0), \
+		"wEchoRAMTest is not in WRAM0"
+	ld hl, wEchoRAMTest
+	ld [hl], %11100100
+	ld hl, wEchoRAMTest + $2000 ; echo RAM
+	ld [hl], %00100111
+	ld a, [wEchoRAMTest]
+	cp %00100111
+	ret
